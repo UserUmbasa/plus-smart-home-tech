@@ -1,4 +1,77 @@
+/**
+ * Протокол событий датчиков, описывающий структуру Avro-записей для различных типов сенсоров.
+ * <p>
+ * Данный протокол определяет схему данных для обмена событиями датчиков в системе.
+ * Каждая запись представляет собой структурированный объект с определённым набором полей.
+ * <p>
+ * Пространство имён: ru.yandex.practicum.kafka.telemetry.event
+ */
 @namespace("ru.yandex.practicum.kafka.telemetry.event")
 protocol SensorEventProtocol {
 
+    /**
+     * Запись для климатического датчика
+     * Содержит данные о температуре, влажности и уровне CO2
+     */
+    record ClimateSensorAvro {
+        int temperature_c;    // температура в градусах Цельсия
+        int humidity;         // уровень влажности
+        int co2_level;        // уровень CO2
+    }
+
+    /**
+     * Запись для датчика освещённости
+     * Содержит данные о качестве связи и уровне освещённости
+     */
+    record LightSensorAvro {
+        int link_quality;     // качество связи
+        int luminosity;       // уровень освещённости
+    }
+
+    /**
+     * Запись для датчика движения
+     * Содержит данные о движении, качестве связи и напряжении
+     */
+    record MotionSensorAvro {
+        int link_quality;     // качество связи
+        boolean motion;      // наличие движения
+        int voltage;         // напряжение
+    }
+
+    /**
+     * Запись для датчика переключения
+     * Содержит состояние переключателя
+     */
+    record SwitchSensorAvro {
+        boolean state;       // состояние переключателя
+    }
+
+    /**
+     * Запись для температурного датчика
+     * Содержит расширенные данные о температуре
+     */
+    record TemperatureSensorAvro {
+        string id;           // идентификатор события
+        string hubId;        // идентификатор хаба
+        timestamp_ms timestamp;    // временная метка
+        int temperature_c;   // температура в градусах Цельсия
+        int temperature_f;   // температура в градусах Фаренгейта
+    }
+
+    /**
+     * Основная запись события датчика
+     * Содержит общую информацию и полезную нагрузку
+     */
+    record SensorEventAvro {
+        string id;           // идентификатор события
+        string hubId;        // идентификатор хаба
+        timestamp_ms timestamp;    // временная метка
+        union { 
+            ClimateSensorAvro, 
+            LightSensorAvro, 
+            MotionSensorAvro, 
+            SwitchSensorAvro, 
+            TemperatureSensorAvro 
+        } payload;           // полезная нагрузка с типом сенсора
+    }
 }
