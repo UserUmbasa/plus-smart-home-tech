@@ -1,0 +1,11 @@
+POST http://localhost:8080/events/sensors
+Content-Type: application/json
+
+{
+  "id": "sensor.light.3",
+  "hubId": "hub-2",
+  "timestamp": "2024-08-06T16:54:03.129Z",
+  "type": "LIGHT_SENSOR_EVENT",
+  "linkQuality": 75,
+  "luminosity": 59
+}
