@@ -62,12 +62,6 @@ public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAdded
     }
 
     private DeviceActionAvro mapToActionAvro(DeviceAction deviceAction) {
-        ActionTypeAvro actionTypeAvro = switch (deviceAction.getType()) {
-            case INVERSE -> ActionTypeAvro.INVERSE;
-            case ACTIVATE -> ActionTypeAvro.ACTIVATE;
-            case SET_VALUE -> ActionTypeAvro.SET_VALUE;
-            case DEACTIVATE -> ActionTypeAvro.DEACTIVATE;
-        };
         return DeviceActionAvro.newBuilder()
                 .setSensorId(deviceAction.getSensorId())
                 .setType(ActionTypeAvro.valueOf(deviceAction.getType().name()))
