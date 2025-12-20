@@ -1,6 +1,10 @@
 package ru.yandex.practicum.telemetry.service.handler.hub;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.grpc.telemetry.event.DeviceActionProto;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.ScenarioAddedEventProto;
+import ru.yandex.practicum.grpc.telemetry.event.ScenarioConditionProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
 import ru.yandex.practicum.telemetry.hub.model.HubEvent;
 import ru.yandex.practicum.telemetry.hub.model.scenario.DeviceAction;
@@ -38,30 +42,30 @@ public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAdded
     }
 
     @Override
-    protected ScenarioAddedEventAvro mapToAvro(HubEvent event) {
-        ScenarioAddedEvent scenarioAddedEvent = (ScenarioAddedEvent) event;
+    protected ScenarioAddedEventAvro mapToAvro(HubEventProto event) {
+        ScenarioAddedEventProto scenarioAddedEvent = event.getScenarioAdded();
         return ScenarioAddedEventAvro.newBuilder()
                 .setName(scenarioAddedEvent.getName())
-                .setConditions(scenarioAddedEvent.getConditions().stream()
+                .setConditions(scenarioAddedEvent.getConditionList().stream()
                         .map(this::mapToConditionAvro)
                         .toList())
-                .setActions(scenarioAddedEvent.getActions().stream()
+                .setActions(scenarioAddedEvent.getActionList().stream()
                         .map(this::mapToActionAvro)
                         .toList())
                 .build();
     }
 
-    private ScenarioConditionAvro mapToConditionAvro(ScenarioCondition scenarioCondition) {
+    private ScenarioConditionAvro mapToConditionAvro(ScenarioConditionProto scenarioCondition) {
 
         return ScenarioConditionAvro.newBuilder()
                 .setSensorId(scenarioCondition.getSensorId())
                 .setOperation(ConditionOperationAvro.valueOf(scenarioCondition.getOperation().name()))
                 .setType(ConditionTypeAvro.valueOf(scenarioCondition.getType().name()))
-                .setValue(scenarioCondition.getValue())
+                .setValue(scenarioCondition.getTypeValue())
                 .build();
     }
 
-    private DeviceActionAvro mapToActionAvro(DeviceAction deviceAction) {
+    private DeviceActionAvro mapToActionAvro(DeviceActionProto deviceAction) {
         return DeviceActionAvro.newBuilder()
                 .setSensorId(deviceAction.getSensorId())
                 .setType(ActionTypeAvro.valueOf(deviceAction.getType().name()))
@@ -70,7 +74,7 @@ public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAdded
     }
 
     @Override
-    public HubEventType getMessageType() {
-        return HubEventType.SCENARIO_ADDED;
+    public HubEventProto.PayloadCase getMessageType() {
+        return HubEventProto.PayloadCase.SCENARIO_ADDED;
     }
 }
