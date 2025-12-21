@@ -5,9 +5,7 @@ import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.SwitchSensorProto;
 import ru.yandex.practicum.kafka.telemetry.event.SwitchSensorAvro;
 import ru.yandex.practicum.telemetry.kafka.KafkaClientProducer;
-import ru.yandex.practicum.telemetry.sensor.model.SensorEvent;
-import ru.yandex.practicum.telemetry.sensor.model.SwitchSensorEvent;
-import ru.yandex.practicum.telemetry.sensor.type.SensorEventType;
+
 
 /**
  * Обработчик событий датчика переключения.
