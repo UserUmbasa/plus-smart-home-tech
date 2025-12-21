@@ -56,12 +56,17 @@ public class ScenarioAddedEventHandler extends BaseHubEventHandler<ScenarioAdded
     }
 
     private ScenarioConditionAvro mapToConditionAvro(ScenarioConditionProto scenarioCondition) {
+        Object value = switch (scenarioCondition.getValueCase()) {
+            case BOOL_VALUE -> scenarioCondition.getBoolValue();
+            case INT_VALUE -> scenarioCondition.getIntValue();
+            case VALUE_NOT_SET -> throw new IllegalArgumentException("Condition. Value not set.");
+        };
 
         return ScenarioConditionAvro.newBuilder()
                 .setSensorId(scenarioCondition.getSensorId())
                 .setOperation(ConditionOperationAvro.valueOf(scenarioCondition.getOperation().name()))
                 .setType(ConditionTypeAvro.valueOf(scenarioCondition.getType().name()))
-                .setValue(scenarioCondition.getTypeValue())
+                .setValue(value)
                 .build();
     }
 

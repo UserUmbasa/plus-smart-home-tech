@@ -50,7 +50,7 @@ protocol HubEventProtocol {
         string sensor_id;
         ConditionTypeAvro type;
         ConditionOperationAvro operation;
-        int? value = null;
+        union { null, int, boolean } value = null;
     }
 
 // запись, описывающая действия, выполняемые устройством в рамках сценария
