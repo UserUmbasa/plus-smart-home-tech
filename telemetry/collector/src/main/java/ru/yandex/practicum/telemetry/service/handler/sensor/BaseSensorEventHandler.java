@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import ru.yandex.practicum.grpc.telemetry.event.SensorEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.telemetry.kafka.KafkaClientProducer;
-import ru.yandex.practicum.telemetry.sensor.model.SensorEvent;
+
 
 import java.time.Instant;
 

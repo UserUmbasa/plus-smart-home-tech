@@ -4,9 +4,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.grpc.telemetry.event.DeviceRemovedEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
-import ru.yandex.practicum.telemetry.hub.model.HubEvent;
-import ru.yandex.practicum.telemetry.hub.model.device.DeviceRemovedEvent;
-import ru.yandex.practicum.telemetry.hub.type.HubEventType;
 import ru.yandex.practicum.telemetry.kafka.KafkaClientProducer;
 
 /**

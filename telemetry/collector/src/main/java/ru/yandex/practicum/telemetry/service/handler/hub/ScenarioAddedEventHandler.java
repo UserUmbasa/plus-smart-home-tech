@@ -6,11 +6,6 @@ import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.ScenarioAddedEventProto;
 import ru.yandex.practicum.grpc.telemetry.event.ScenarioConditionProto;
 import ru.yandex.practicum.kafka.telemetry.event.*;
-import ru.yandex.practicum.telemetry.hub.model.HubEvent;
-import ru.yandex.practicum.telemetry.hub.model.scenario.DeviceAction;
-import ru.yandex.practicum.telemetry.hub.model.scenario.ScenarioAddedEvent;
-import ru.yandex.practicum.telemetry.hub.model.scenario.ScenarioCondition;
-import ru.yandex.practicum.telemetry.hub.type.HubEventType;
 import ru.yandex.practicum.telemetry.kafka.KafkaClientProducer;
 
 /**
