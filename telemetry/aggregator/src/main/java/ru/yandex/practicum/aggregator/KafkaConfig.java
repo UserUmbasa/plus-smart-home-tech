@@ -1,6 +1,6 @@
 package ru.yandex.practicum.aggregator;
 
-import deserializer.SensorEventDeserializer;
+
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -10,9 +10,10 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import ru.yandex.practicum.aggregator.deserializer.SensorEventDeserializer;
+import ru.yandex.practicum.aggregator.serializer.AvroSerializer;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
-import serializer.AvroSerializer;
 
 import java.util.Properties;
 
