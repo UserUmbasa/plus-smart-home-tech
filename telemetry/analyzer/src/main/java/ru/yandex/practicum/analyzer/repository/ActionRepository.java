@@ -5,7 +5,6 @@ import ru.yandex.practicum.analyzer.model.Action;
 import ru.yandex.practicum.analyzer.model.Scenario;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ActionRepository extends JpaRepository<Action, Long> {
 
