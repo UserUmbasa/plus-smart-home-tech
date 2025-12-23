@@ -1,20 +1,15 @@
 package ru.yandex.practicum.aggregator;
 
-import jakarta.annotation.PostConstruct;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.aggregator.deserializer.SensorEventDeserializer;
-import ru.yandex.practicum.aggregator.serializer.AvroSerializer;
 import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
@@ -30,36 +25,15 @@ import java.util.*;
 @RequiredArgsConstructor
 public class AggregationStarter {
 
-    private KafkaConsumer<String, SensorEventAvro> consumer;
-    private KafkaProducer<String, SensorsSnapshotAvro> producer;
+    private final KafkaConsumer<String, SensorEventAvro> consumer;
+    private final KafkaProducer<String, SensorsSnapshotAvro> producer;
     private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
     private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
-    @Value("${kafka.kafka-servers}")
-    private String bootstrapServers;
-    @Value("${kafka.group-id}")
-    private String groupId;
     @Value("${kafka.topic-sensors}")
     private String topicSensors;
     @Value("${kafka.topic-snapshots}")
     private String topicSnapshots;
-
-
-    @PostConstruct
-    public void init() {
-        Properties configConsumer = new Properties();
-        configConsumer.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configConsumer.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-        configConsumer.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        configConsumer.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, SensorEventDeserializer.class.getName());
-        consumer = new KafkaConsumer<>(configConsumer);
-
-        Properties configProducer = new Properties();
-        configProducer.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        configProducer.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
-        configProducer.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, AvroSerializer.class.getName());
-        producer = new KafkaProducer<>(configProducer);
-    }
 
     /**
      * Метод для начала процесса агрегации данных.

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.aggregator.deserializer;
+package deserializer;
 
 import org.apache.avro.Schema;
 import org.apache.avro.io.Decoder;
