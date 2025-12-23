@@ -8,6 +8,7 @@ kafka:
     group-id: analyzer-snapshot-group
   bootstrap-servers: localhost:9092
 
+
 grpc:
   client:
     hub-router:
