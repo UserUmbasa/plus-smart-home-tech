@@ -1,42 +1,38 @@
-package ru.yandex.practicum.aggregator.deserializer;
+package ru.yandex.practicum.deserializer;
 
 import org.apache.avro.Schema;
-import org.apache.avro.io.Decoder;
+import org.apache.avro.io.BinaryDecoder;
+import org.apache.avro.io.DatumReader;
 import org.apache.avro.io.DecoderFactory;
-import org.apache.avro.specific.SpecificData;
+import org.apache.avro.specific.SpecificDatumReader;
 import org.apache.avro.specific.SpecificRecordBase;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Deserializer;
 
-
 public class BaseAvroDeserializer<T extends SpecificRecordBase> implements Deserializer<T> {
-
     private final DecoderFactory decoderFactory;
-    private final Schema schema;
-    private final SpecificData specificData;
+    private final DatumReader<T> reader;
+
 
     public BaseAvroDeserializer(Schema schema) {
         this(DecoderFactory.get(), schema);
     }
 
     public BaseAvroDeserializer(DecoderFactory decoderFactory, Schema schema) {
+        reader = new SpecificDatumReader<>(schema);
         this.decoderFactory = decoderFactory;
-        this.schema = schema;
-        this.specificData = new SpecificData();
     }
 
     @Override
     public T deserialize(String topic, byte[] data) {
-        if (data == null) {
-            return null;
-        }
-
         try {
-            Decoder decoder = decoderFactory.binaryDecoder(data, null);
-            return (T) specificData.createDatumReader(schema).read(null, decoder);
+            if (data != null) {
+                BinaryDecoder decoder = decoderFactory.binaryDecoder(data, null);
+                return this.reader.read(null, decoder);
+            }
+            return null;
         } catch (Exception e) {
-            throw new SerializationException("Can't deserialize data", e);
+            throw new SerializationException("Ошибка десериализации данных из топика [" + topic + "]", e);
         }
     }
 }
-

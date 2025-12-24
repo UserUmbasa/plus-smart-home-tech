@@ -73,7 +73,7 @@ public class SnapshotHandler {
                 ClimateSensorAvro climateSensor = (ClimateSensorAvro) sensorState.getData();
                 return handleOperation(condition, climateSensor.getHumidity());
             }
-            default -> {
+            case null -> {
                 return false;
             }
         }
@@ -92,7 +92,7 @@ public class SnapshotHandler {
             case GREATER_THAN -> {
                 return currentValue > targetValue;
             }
-            default -> {
+            case null -> {
                 return null;
             }
         }

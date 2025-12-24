@@ -1,4 +1,5 @@
-package ru.yandex.practicum.analyzer.deserializer;
+package ru.yandex.practicum.deserializer;
+
 
 import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
 

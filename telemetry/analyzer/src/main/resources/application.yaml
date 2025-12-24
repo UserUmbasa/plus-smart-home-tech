@@ -2,10 +2,13 @@ kafka:
   topics:
     snapshots: "telemetry.snapshots.v1"
     hubs: "telemetry.hubs.v1"
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   hub-consumer-properties:
     group-id: analyzer-hub-group
+    value-deserializer: ru.yandex.practicum.deserializer.HubEventDeserializer
   snapshot-consumer-properties:
     group-id: analyzer-snapshot-group
+    value-deserializer: ru.yandex.practicum.deserializer.SensorsSnapshotDeserializer
   bootstrap-servers: localhost:9092
 
 

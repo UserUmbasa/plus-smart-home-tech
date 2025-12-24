@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -28,7 +27,6 @@ public class AggregationStarter {
     private final KafkaConsumer<String, SensorEventAvro> consumer;
     private final KafkaProducer<String, SensorsSnapshotAvro> producer;
     private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
-    private static final Map<TopicPartition, OffsetAndMetadata> currentOffsets = new HashMap<>();
 
     @Value("${kafka.topic-sensors}")
     private String topicSensors;
@@ -48,11 +46,27 @@ public class AggregationStarter {
             while (true) {
                 ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(1000));
 
-                int count = 0;
                 for (ConsumerRecord<String, SensorEventAvro> record : records) {
-                    handleRecord(record);
-                    manageOffsets(record, count, consumer);
-                    count++;
+                    try {
+                        Optional<SensorsSnapshotAvro> mayBeSnapshot = updateState(record.value());
+
+                        if (mayBeSnapshot.isPresent()) {
+                            SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
+                            ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
+                                    new ProducerRecord<>(topicSnapshots, snapshot.getHubId(), snapshot);
+
+                            producer.send(producerRecord, (metadata, exception) -> {
+                                if (exception != null) {
+                                    log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
+                                } else {
+                                    log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
+                                            producerRecord, metadata.topic(), metadata.offset());
+                                }
+                            });
+                        }
+                    } catch (Exception e) {
+                        log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
+                    }
                 }
                 consumer.commitAsync();
             }
@@ -73,47 +87,6 @@ public class AggregationStarter {
                 log.info("Закрываем продюсер");
                 producer.close();
             }
-        }
-    }
-
-    private static void manageOffsets(ConsumerRecord<String, SensorEventAvro> record, int count, KafkaConsumer<String, SensorEventAvro> consumer) {
-        // обновляем текущий оффсет для топика-партиции
-        currentOffsets.put(
-                new TopicPartition(record.topic(), record.partition()),
-                new OffsetAndMetadata(record.offset() + 1)
-        );
-
-        if(count % 10 == 0) {
-            consumer.commitAsync(currentOffsets, (offsets, exception) -> {
-                if(exception != null) {
-                    log.warn("Ошибка во время фиксации оффсетов: {}", offsets, exception);
-                }
-            });
-        }
-    }
-
-    private void handleRecord(ConsumerRecord<String, SensorEventAvro> record) throws InterruptedException {
-        log.info("топик = {}, партиция = {}, смещение = {}, значение: {}\n",
-                record.topic(), record.partition(), record.offset(), record.value());
-        try {
-            Optional<SensorsSnapshotAvro> mayBeSnapshot = updateState(record.value());
-
-            if (mayBeSnapshot.isPresent()) {
-                SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
-                ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
-                        new ProducerRecord<>(topicSnapshots, snapshot.getHubId(), snapshot);
-
-                producer.send(producerRecord, (metadata, exception) -> {
-                    if (exception != null) {
-                        log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
-                    } else {
-                        log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
-                                producerRecord, metadata.topic(), metadata.offset());
-                    }
-                });
-            }
-        } catch (Exception e) {
-            log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
         }
     }
 

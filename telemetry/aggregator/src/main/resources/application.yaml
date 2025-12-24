@@ -3,3 +3,6 @@ kafka:
   topic-sensors: telemetry.sensors.v1
   topic-snapshots: telemetry.snapshots.v1
   group-id: telemetry.aggregator
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value-deserializer: ru.yandex.practicum.deserializer.SensorEventDeserializer
+  value-serializer: ru.yandex.practicum.serializer.GeneralAvroSerializer
