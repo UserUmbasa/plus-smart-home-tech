@@ -51,9 +51,6 @@ protocol SensorEventProtocol {
      * Содержит расширенные данные о температуре
      */
     record TemperatureSensorAvro {
-        string id;           // идентификатор события
-        string hubId;        // идентификатор хаба
-        timestamp_ms timestamp;    // временная метка
         int temperature_c;   // температура в градусах Цельсия
         int temperature_f;   // температура в градусах Фаренгейта
     }

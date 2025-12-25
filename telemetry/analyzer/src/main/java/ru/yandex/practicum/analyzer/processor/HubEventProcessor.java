@@ -52,7 +52,6 @@ public class HubEventProcessor implements Runnable {
                         throw new IllegalArgumentException("Не могу найти обработчик для события " + event);
                     }
                 }
-
                 hubConsumer.commitSync();
                 log.info("Хартбит хаб");
             }
