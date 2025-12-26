@@ -40,8 +40,12 @@ public class KafkaProducerConfig {
     KafkaClientProducer getProducer() {
         return new KafkaClientProducer() {
             private Producer<String, SpecificRecordBase> producer;
+
             @Value("${kafka.bootstrap.server}")
             private String bootstrapServer;
+
+            @Value("${kafka.value-serializer}")
+            private String serializer;
 
             @Override
             public Producer<String, SpecificRecordBase> getProducer() {
@@ -54,8 +58,8 @@ public class KafkaProducerConfig {
             private void initProducer() {
                 Properties config = new Properties();
                 config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
-                config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-                config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, GeneralAvroSerializer.class);
+                config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+                config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, serializer);
 
                 producer = new KafkaProducer<>(config);
             }

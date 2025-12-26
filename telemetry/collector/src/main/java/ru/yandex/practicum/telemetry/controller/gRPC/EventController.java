@@ -34,7 +34,7 @@ public class EventController extends CollectorControllerGrpc.CollectorController
     }
 
     @Override
-    public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
+    public void  collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
         log.info("Получили событие от датчика: {}", request);
         try {
             // проверяем, есть ли обработчик для полученного события
