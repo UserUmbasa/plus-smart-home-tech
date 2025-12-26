@@ -34,14 +34,8 @@ public class EventController extends CollectorControllerGrpc.CollectorController
     }
 
     @Override
-    public void collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
+    public void  collectSensorEvent(SensorEventProto request, StreamObserver<Empty> responseObserver) {
         log.info("Получили событие от датчика: {}", request);
-        try {
-            Thread.sleep(1000);  // 3000 миллисекунд = 3 секунды
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();  // Восстанавливаем флаг прерывания
-            e.printStackTrace();
-        }
         try {
             // проверяем, есть ли обработчик для полученного события
             if (sensorEventHandlers.containsKey(request.getPayloadCase())) {

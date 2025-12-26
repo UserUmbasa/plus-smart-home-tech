@@ -44,7 +44,7 @@ public class AggregationStarter {
             log.info("Подписка на топик {}", topicSensors);
 
             while (true) {
-                ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(1000));
+                ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(100));
 
                 for (ConsumerRecord<String, SensorEventAvro> record : records) {
                     try {

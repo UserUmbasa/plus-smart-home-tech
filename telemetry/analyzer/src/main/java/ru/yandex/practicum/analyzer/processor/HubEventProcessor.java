@@ -39,7 +39,7 @@ public class HubEventProcessor implements Runnable {
 
             while (true) {
 
-                ConsumerRecords<String, HubEventAvro> records = hubConsumer.poll(Duration.ofMillis(1000));
+                ConsumerRecords<String, HubEventAvro> records = hubConsumer.poll(Duration.ofMillis(2000));
 
                 for (ConsumerRecord<String, HubEventAvro> record : records) {
                     HubEventAvro event = record.value();
