@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.analyzer.model.Sensor;
 import ru.yandex.practicum.analyzer.repository.SensorRepository;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceRemovedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
+
+import java.util.Optional;
 
 /**
  * Обработчик событий удаления устройств (сенсоров) из системы.
@@ -22,8 +25,18 @@ public class DeviceRemovedHandler implements HubEventHandler {
     @Transactional
     public void handle(HubEventAvro event) {
         DeviceRemovedEventAvro removedEvent = (DeviceRemovedEventAvro) event.getPayload();
-        log.info("Удаляем устройство с id = {} из хаба с hub_id = {}", removedEvent.getId(), event.getHubId());
-        repository.deleteByIdAndHubId(removedEvent.getId(), event.getHubId());
+        String sensorId = removedEvent.getId();
+        String hubId = event.getHubId();
+
+        // Проверяем существование устройства перед удалением
+        Optional<Sensor> existingSensor = repository.findByIdAndHubId(sensorId, hubId);
+
+        if (existingSensor.isPresent()) {
+            repository.deleteByIdAndHubId(sensorId, hubId);
+            log.info("Устройство с id = {} успешно удалено из хаба с hub_id = {}", sensorId, hubId);
+        } else {
+            log.info("Устройство с id = {} не найдено в хабе с hub_id = {}, удаление пропущено", sensorId, hubId);
+        }
     }
 
     @Override

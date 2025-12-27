@@ -36,29 +36,50 @@ public class ScenarioAddedHandler implements HubEventHandler {
     @Override
     @Transactional
     public void handle(HubEventAvro event) {
-        ScenarioAddedEventAvro scenarioAddedEvent = (ScenarioAddedEventAvro) event.getPayload();
+        try {
+            ScenarioAddedEventAvro scenarioAddedEvent = (ScenarioAddedEventAvro) event.getPayload();
+            String hubId = event.getHubId();
+            String scenarioName = scenarioAddedEvent.getName();
 
-        Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(event.getHubId(),
-                scenarioAddedEvent.getName());
+            // Проверяем существование сценария
+            Optional<Scenario> scenarioOpt = scenarioRepository.findByHubIdAndName(hubId, scenarioName);
 
-        if (scenarioOpt.isEmpty()) {
+            if (scenarioOpt.isPresent()) {
+                Scenario scenario = scenarioOpt.get();
+
+                // Очищаем старые условия и действия перед добавлением новых
+                conditionRepository.deleteByScenario(scenario);
+                actionRepository.deleteByScenario(scenario);
+
+                // Добавляем новые условия и действия
+                if (checkSensorsInScenarioConditions(scenarioAddedEvent, hubId)) {
+                    conditionRepository.saveAll(mapToCondition(scenarioAddedEvent, scenario));
+                }
+
+                if (checkSensorsInScenarioActions(scenarioAddedEvent, hubId)) {
+                    actionRepository.saveAll(mapToAction(scenarioAddedEvent, scenario));
+                }
+
+                log.info("Сценарий {} успешно обновлен для хаба {}", scenarioName, hubId);
+                return;
+            }
+
+            // Если сценария нет - создаем новый
             Scenario scenario = scenarioRepository.save(mapToScenario(event));
-            if (checkSensorsInScenarioConditions(scenarioAddedEvent, event.getHubId())) {
-                conditionRepository.saveAll(mapToCondition(scenarioAddedEvent, scenario));
-            }
-            if (checkSensorsInScenarioActions(scenarioAddedEvent, event.getHubId())) {
-                actionRepository.saveAll(mapToAction(scenarioAddedEvent, scenario));
-            }
-        } else {
-            Scenario scenario = scenarioOpt.get();
 
-            if (checkSensorsInScenarioConditions(scenarioAddedEvent, event.getHubId())) {
+            if (checkSensorsInScenarioConditions(scenarioAddedEvent, hubId)) {
                 conditionRepository.saveAll(mapToCondition(scenarioAddedEvent, scenario));
             }
 
-            if (checkSensorsInScenarioActions(scenarioAddedEvent, event.getHubId())) {
+            if (checkSensorsInScenarioActions(scenarioAddedEvent, hubId)) {
                 actionRepository.saveAll(mapToAction(scenarioAddedEvent, scenario));
             }
+
+            log.info("Сценарий {} успешно добавлен для хаба {}", scenarioName, hubId);
+
+        } catch (Exception e) {
+            log.error("Ошибка при обработке события добавления сценария: {}", e.getMessage());
+            throw e; // Перебрасываем исключение для повторной обработки
         }
     }
 

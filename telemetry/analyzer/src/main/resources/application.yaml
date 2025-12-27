@@ -10,6 +10,8 @@ kafka:
     group-id: analyzer-snapshot-group
     value-deserializer: ru.yandex.practicum.deserializer.SensorsSnapshotDeserializer
   bootstrap-servers: localhost:9092
+  consumer:
+    enable-auto-commit: false
 
 grpc:
   client:

@@ -6,3 +6,7 @@ kafka:
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   value-deserializer: ru.yandex.practicum.deserializer.SensorEventDeserializer
   value-serializer: ru.yandex.practicum.serializer.GeneralAvroSerializer
+  consumer:
+    enable-auto-commit: false
+    poll-timeout: 100
+

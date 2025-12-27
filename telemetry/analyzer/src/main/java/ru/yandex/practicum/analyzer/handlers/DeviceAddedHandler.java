@@ -9,6 +9,8 @@ import ru.yandex.practicum.analyzer.repository.SensorRepository;
 import ru.yandex.practicum.kafka.telemetry.event.DeviceAddedEventAvro;
 import ru.yandex.practicum.kafka.telemetry.event.HubEventAvro;
 
+import java.util.Optional;
+
 /**
  * Обработчик событий добавления устройств в систему.
  * Данный класс отвечает за обработку событий добавления новых устройств (сенсоров)
@@ -23,21 +25,28 @@ public class DeviceAddedHandler implements HubEventHandler {
     @Override
     @Transactional
     public void handle(HubEventAvro event) {
-        log.info("Сохраняем новое устройство для хаба с id = {}", event.getHubId());
-        repository.save(mapToSensor(event));
+        DeviceAddedEventAvro deviceAddedEvent = (DeviceAddedEventAvro) event.getPayload();
+        String sensorId = deviceAddedEvent.getId();
+        String hubId = event.getHubId();
+        // Проверяем, существует ли устройство уже в базе
+        Optional<Sensor> existingSensor = repository.findById(sensorId);
+
+        if (existingSensor.isPresent()) {
+            log.info("Устройство с id={} уже существует для хаба {}", sensorId, hubId);
+            return;
+        }
+
+        Sensor newSensor = Sensor.builder()
+                .id(sensorId)
+                .hubId(hubId)
+                .build();
+
+        repository.save(newSensor);
+        log.info("Устройство с id={} успешно добавлено для хаба {}", sensorId, hubId);
     }
 
     @Override
     public String getPayloadType() {
         return DeviceAddedEventAvro.class.getSimpleName();
-    }
-
-    private Sensor mapToSensor(HubEventAvro event) {
-        DeviceAddedEventAvro deviceAddedEvent = (DeviceAddedEventAvro) event.getPayload();
-
-        return Sensor.builder()
-                .id(deviceAddedEvent.getId())
-                .hubId(event.getHubId())
-                .build();
     }
 }

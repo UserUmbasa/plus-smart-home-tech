@@ -1,6 +1,7 @@
 package ru.yandex.practicum.aggregator;
 
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.*;
@@ -32,6 +33,17 @@ public class AggregationStarter {
     private String topicSensors;
     @Value("${kafka.topic-snapshots}")
     private String topicSnapshots;
+    @Value("${kafka.consumer.poll-timeout}")
+    private long pollTimeoutMillis;
+
+    @PostConstruct
+    public void init() {
+        // Добавляем хук завершения JVM
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Сработал хук на завершение JVM. Прерываю работу консьюмера.");
+            consumer.wakeup();
+        }));
+    }
 
     /**
      * Метод для начала процесса агрегации данных.
@@ -44,31 +56,35 @@ public class AggregationStarter {
             log.info("Подписка на топик {}", topicSensors);
 
             while (true) {
-                ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(100));
+                ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(pollTimeoutMillis));
 
-                for (ConsumerRecord<String, SensorEventAvro> record : records) {
-                    try {
-                        Optional<SensorsSnapshotAvro> mayBeSnapshot = updateState(record.value());
+                if (!records.isEmpty()) {
+                    for (ConsumerRecord<String, SensorEventAvro> record : records) {
+                        try {
+                            Optional<SensorsSnapshotAvro> mayBeSnapshot = updateState(record.value());
 
-                        if (mayBeSnapshot.isPresent()) {
-                            SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
-                            ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
-                                    new ProducerRecord<>(topicSnapshots, snapshot.getHubId(), snapshot);
+                            if (mayBeSnapshot.isPresent()) {
+                                SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
+                                ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
+                                        new ProducerRecord<>(topicSnapshots, snapshot.getHubId(), snapshot);
 
-                            producer.send(producerRecord, (metadata, exception) -> {
-                                if (exception != null) {
-                                    log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
-                                } else {
-                                    log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
-                                            producerRecord, metadata.topic(), metadata.offset());
-                                }
-                            });
+                                producer.send(producerRecord, (metadata, exception) -> {
+                                    if (exception != null) {
+                                        log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
+                                    } else {
+                                        log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
+                                                producerRecord, metadata.topic(), metadata.offset());
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
                         }
-                    } catch (Exception e) {
-                        log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
                     }
+                    consumer.commitAsync();
                 }
-                consumer.commitAsync();
+
+
             }
 
         } catch (WakeupException ignored) {
