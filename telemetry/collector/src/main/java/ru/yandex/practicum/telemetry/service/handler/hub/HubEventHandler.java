@@ -1,7 +1,6 @@
 package ru.yandex.practicum.telemetry.service.handler.hub;
 
-import ru.yandex.practicum.telemetry.hub.model.HubEvent;
-import ru.yandex.practicum.telemetry.hub.type.HubEventType;
+import ru.yandex.practicum.grpc.telemetry.event.HubEventProto;
 
 /**
  * Интерфейс обработчика событий хаба.
@@ -20,6 +19,6 @@ import ru.yandex.practicum.telemetry.hub.type.HubEventType;
  * </ul>
  */
 public interface HubEventHandler {
-    HubEventType getMessageType();
-    void handle(HubEvent event);
+    HubEventProto.PayloadCase getMessageType();
+    void handle(HubEventProto event);
 }

@@ -1,0 +1,136 @@
+package ru.yandex.practicum.aggregator;
+
+
+import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.*;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.errors.WakeupException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+import ru.yandex.practicum.kafka.telemetry.event.SensorEventAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorStateAvro;
+import ru.yandex.practicum.kafka.telemetry.event.SensorsSnapshotAvro;
+
+import java.time.Duration;
+import java.util.*;
+
+/**
+ * Класс AggregationStarter, ответственный за запуск агрегации данных.
+ */
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class AggregationStarter {
+
+    private final KafkaConsumer<String, SensorEventAvro> consumer;
+    private final KafkaProducer<String, SensorsSnapshotAvro> producer;
+    private final Map<String, SensorsSnapshotAvro> snapshots = new HashMap<>();
+
+    @Value("${kafka.topic-sensors}")
+    private String topicSensors;
+    @Value("${kafka.topic-snapshots}")
+    private String topicSnapshots;
+    @Value("${kafka.consumer.poll-timeout}")
+    private long pollTimeoutMillis;
+
+    @PostConstruct
+    public void init() {
+        // Добавляем хук завершения JVM
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("Сработал хук на завершение JVM. Прерываю работу консьюмера.");
+            consumer.wakeup();
+        }));
+    }
+
+    /**
+     * Метод для начала процесса агрегации данных.
+     * Подписывается на топики для получения событий от датчиков,
+     * формирует снимок их состояния и записывает в кафку.
+     */
+    public void start() {
+        try {
+            consumer.subscribe(List.of(topicSensors));
+            log.info("Подписка на топик {}", topicSensors);
+
+            while (true) {
+                ConsumerRecords<String, SensorEventAvro> records = consumer.poll(Duration.ofMillis(pollTimeoutMillis));
+
+                if (!records.isEmpty()) {
+                    for (ConsumerRecord<String, SensorEventAvro> record : records) {
+                        try {
+                            Optional<SensorsSnapshotAvro> mayBeSnapshot = updateState(record.value());
+
+                            if (mayBeSnapshot.isPresent()) {
+                                SensorsSnapshotAvro snapshot = mayBeSnapshot.get();
+                                ProducerRecord<String, SensorsSnapshotAvro> producerRecord =
+                                        new ProducerRecord<>(topicSnapshots, snapshot.getHubId(), snapshot);
+
+                                producer.send(producerRecord, (metadata, exception) -> {
+                                    if (exception != null) {
+                                        log.error("Ошибка при отправке сообщения в Kafka: {}", exception.getMessage(), exception);
+                                    } else {
+                                        log.info("Сообщение={} отправлено в Kafka: топик={}, смещение={}",
+                                                producerRecord, metadata.topic(), metadata.offset());
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            log.error("Ошибка при обработке записи: ключ={}, значение={}", record.key(), record.value(), e);
+                        }
+                    }
+                    consumer.commitAsync();
+                }
+
+
+            }
+
+        } catch (WakeupException ignored) {
+
+        } catch (Exception e) {
+            log.error("Ошибка во время обработки событий от датчиков", e);
+        } finally {
+            try {
+                producer.flush();
+                log.info("Все данные отправлены в Kafka");
+                consumer.commitSync();
+                log.info("Все смещения зафиксированы");
+            } finally {
+                log.info("Закрываем консьюмер");
+                consumer.close();
+                log.info("Закрываем продюсер");
+                producer.close();
+            }
+        }
+    }
+
+    public Optional<SensorsSnapshotAvro> updateState(SensorEventAvro event) {
+        SensorsSnapshotAvro snapshot = snapshots.get(event.getHubId());
+        if (snapshot == null) {
+            snapshot = new SensorsSnapshotAvro();
+            snapshot.setHubId(event.getHubId());
+            snapshot.setTimestamp(event.getTimestamp());
+            snapshot.setSensorsState(new HashMap<>());
+        }
+
+        SensorStateAvro oldState = snapshot.getSensorsState().get(event.getId());
+        if (oldState != null) {
+            // Если oldState произошёл позже, чем event
+            // или данные совпадают, то обновление не требуется
+            if (oldState.getTimestamp().isAfter(event.getTimestamp()) ||
+                    oldState.getData().equals(event.getPayload())) {
+                return Optional.empty();
+            }
+        }
+
+        SensorStateAvro newState = new SensorStateAvro();
+        newState.setTimestamp(event.getTimestamp());
+        newState.setData(event.getPayload());
+        snapshot.getSensorsState().put(event.getId(), newState);
+        snapshot.setTimestamp(event.getTimestamp());
+        snapshots.put(event.getHubId(), snapshot);
+        return Optional.of(snapshot);
+    }
+}
