@@ -1,6 +1,6 @@
 spring:
   application:
-    name: aggregator
+    name: collector
   config:
     # spring.config.import импорт конфигурации из другого источника (configserver:http://localhost:8888)
     import: configserver:http://localhost:8888
