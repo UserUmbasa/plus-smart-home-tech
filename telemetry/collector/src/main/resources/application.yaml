@@ -1,12 +1,31 @@
+# Конфигурация Spring приложения
 spring:
+  # Настройка основного приложения
   application:
-    name: collector
+    name: collector  # Название сервиса, которое будет использоваться в системе
+
+  # Настройки конфигурационного сервера
   config:
-    # spring.config.import импорт конфигурации из другого источника (configserver:http://localhost:8888)
-    import: configserver:http://localhost:8888
+    # Импорт конфигурации из внешнего источника
+   # import: configserver:http://localhost:8888 Указывает на расположение Config Server, если напрямую
+   import: "configserver:"  # используем Service Discovery
+
+  # Настройки Spring Cloud
   cloud:
     config:
-      fail-fast: true
-      retry:
-        useRandomPolicy: true
-        max-interval: 6000
+     fail-fast: true  # Принудительное завершение работы при невозможности получить конфигурацию
+    retry:
+      useRandomPolicy: true  # Использование случайной политики повторных попыток
+      max-interval: 6000     # Максимальный интервал между повторными попытками в миллисекундах
+
+      discovery: # Настройки обнаружения Config Server
+        enabled: true  # Включение режима обнаружения через Service Discovery
+        serviceId: config-server  # ID сервиса Config Server для обнаружения
+
+# Настройки Eureka клиента
+eureka:
+  client:
+    serviceUrl:  # URL для связи с Eureka сервером
+      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
+      # Используются переменные для гибкости настройки хоста и порта
+      # По умолчанию используется localhost:8761
