@@ -18,6 +18,7 @@
 
     <dependencies>
 
+        <!--    клиент конфига сервера       -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-config</artifactId>

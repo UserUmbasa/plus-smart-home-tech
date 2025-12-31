@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 
 @SpringBootApplication
-public class SmartHomeCollector {
+public class Collector {
     public static void main(String[] args) {
-        SpringApplication.run(SmartHomeCollector.class, args);
+        SpringApplication.run(Collector.class, args);
     }
 }

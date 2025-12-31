@@ -2,33 +2,19 @@ spring:
   application:
     name: config-server
   profiles:
+    # {profile} — Spring-профиль, указывает, что конфиги расположены локально (не на гите например)
     active: native
   cloud:
     config:
       server:
         native:
           searchLocations:
+            - # Префикс file указывают, если используется абсолютный путь к файлу. Если файл расположен в ресурсах проекта, указывают префикс classpath.
+            - #{application} — имя приложения-клиента, которое будет использовать сервер конфигураций.
             - classpath:config/telemetry/{application}
+  discovery: # Добавляем секцию discovery
+    enabled: true  # Включаем обнаружение сервисов
+    service-id: config-server  # Указываем ID сервиса
 
 server:
   port: 8888
-#
-#application:
-#  name: aggregator
-#
-#kafka:
-#  kafka-servers: localhost:9092
-#  topic-sensors: telemetry.sensors.v1
-#  topic-snapshots: telemetry.snapshots.v1
-#  group-id: telemetry.aggregator
-#  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-#  value-deserializer: ru.yandex.practicum.deserializer.SensorEventDeserializer
-#  value-serializer: ru.yandex.practicum.serializer.GeneralAvroSerializer
-#  consumer:
-#    enable-auto-commit: false
-#    poll-timeout: 100
-#server:
-#  port : 8082
-#
-## Файл: config/telemetry/aggregator/application.yml
-

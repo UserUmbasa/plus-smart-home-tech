@@ -1,0 +1,17 @@
+application:
+  name: collector
+
+kafka:
+  topic:
+    hub: telemetry.hubs.v1
+    sensor: telemetry.sensors.v1
+  bootstrap:
+    server: localhost:9092
+  value-serializer: ru.yandex.practicum.serializer.GeneralAvroSerializer
+
+server:
+  port: 8081
+
+grpc:
+  server:
+    port: 59091
