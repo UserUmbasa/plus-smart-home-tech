@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.dto.shoppingStore;
 
 /**
  * Представляет собой классификацию всех доступных устройств Smart Home Technologies

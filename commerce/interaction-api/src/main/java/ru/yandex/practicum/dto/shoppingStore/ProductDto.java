@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.dto.shoppingStore;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -13,8 +13,6 @@ import java.util.UUID;
 
 @Builder
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class ProductDto {
     private UUID productId;
     @NotNull

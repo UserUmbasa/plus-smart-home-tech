@@ -2,11 +2,16 @@ package ru.yandex.practicum.model;
 
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
+import ru.yandex.practicum.dto.shoppingStore.ProductState;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
 
 @Getter
 @Setter

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.dto.shoppingStore;
 
 /**
  * Используется для категоризации состояния запасов товара и информирования

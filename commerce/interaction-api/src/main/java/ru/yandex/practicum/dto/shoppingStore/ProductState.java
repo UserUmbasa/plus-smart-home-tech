@@ -1,4 +1,4 @@
-package ru.yandex.practicum.model;
+package ru.yandex.practicum.dto.shoppingStore;
 
 /**
  * ACTIVE(«активный») и DEACTIVATE(«неактивный»). Товар переходит в неактивное состояние,
