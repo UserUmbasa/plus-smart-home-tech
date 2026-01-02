@@ -13,6 +13,7 @@ spring:
             - # Префикс file указывают, если используется абсолютный путь к файлу. Если файл расположен в ресурсах проекта, указывают префикс classpath.
             - #{application} — имя приложения-клиента, которое будет использовать сервер конфигураций.
             - classpath:config/telemetry/{application}
+            - classpath:config/commerce/{application}
   discovery: # Добавляем секцию discovery
     enabled: true  # Включаем обнаружение сервисов
     service-id: config-server  # Указываем ID сервиса
