@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.shoppingStore.ShoppingStoreOperations;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
 import java.util.List;
@@ -32,8 +33,21 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
 
     @Override
     public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
-        return List.of();
+        return shoppingStoreService.getProducts(category, pageable);
     }
 
+    @Override
+    public ProductDto updateProduct(ProductDto productDto) {
+        return shoppingStoreService.updateProduct(productDto);
+    }
 
+    @Override
+    public boolean removeProductFromStore(UUID productId) {
+        return shoppingStoreService.removeProduct(productId);
+    }
+
+    @Override
+    public boolean setProductQuantityState(UUID productId, QuantityState quantityState) {
+        return shoppingStoreService.updateQuantityState(productId, quantityState);
+    }
 }

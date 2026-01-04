@@ -21,6 +21,7 @@
 
     <!-- Зависимости проекта -->
     <dependencies>
+
         <!-- Клиент для работы с Eureka Server (обнаружение сервисов) -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -56,4 +57,27 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- Добавляем профили для управления запуском -->
+    <profiles>
+        <!-- Профиль для запуска сервера обнаружения -->
+        <profile>
+            <id>config</id>
+            <activation>
+                <activeByDefault>true</activeByDefault> <!-- Активируется по умолчанию -->
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <!-- Указываем главный класс приложения -->
+                            <mainClass>ru.yandex.practicum.ConfigServer</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

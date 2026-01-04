@@ -12,7 +12,33 @@ import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-
+/**
+ * Сущность продукта магазина.
+ * <p>
+ * Класс представляет собой модель товара, хранящегося в магазине.
+ * Отображается в таблице базы данных store.products.
+ * Содержит полную информацию о характеристиках товара, его состоянии и категории.
+ *
+ * Основные характеристики:
+ * <ul>
+ *     <li>Хранится в таблице store.products</li>
+ *     <li>Содержит основные характеристики товара</li>
+ *     <li>Отслеживает состояние товара и его категорию</li>
+ *     <li>Содержит информацию о цене и доступности</li>
+ * </ul>
+ *
+ * Поля сущности:
+ * <ul>
+ *     <li>{@code productId} - уникальный идентификатор продукта</li>
+ *     <li>{@code productName} - название продукта</li>
+ *     <li>{@code description} - описание товара</li>
+ *     <li>{@code imageSrc} - ссылка на изображение товара</li>
+ *     <li>{@code quantityState} - состояние количества товара</li>
+ *     <li>{@code productState} - общее состояние продукта</li>
+ *     <li>{@code productCategory} - категория товара</li>
+ *     <li>{@code price} - цена продукта</li>
+ * </ul>
+ */
 @Getter
 @Setter
 @Entity
@@ -22,7 +48,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     private UUID productId;
-    @Column(name = "name", nullable = false)
+    @Column(name = "product_name", nullable = false)
     private String productName;
     @Column(nullable = false)
     private String description;

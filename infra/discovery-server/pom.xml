@@ -16,6 +16,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -36,4 +37,26 @@
         </plugins>
     </build>
 
+    <!-- Добавляем профили для управления запуском -->
+    <profiles>
+        <!-- Профиль для запуска сервера обнаружения -->
+        <profile>
+            <id>discovery</id>
+            <activation>
+                <activeByDefault>true</activeByDefault> <!-- Активируется по умолчанию -->
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <!-- Указываем главный класс приложения -->
+                            <mainClass>ru.yandex.practicum.DiscoveryServer</mainClass>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
