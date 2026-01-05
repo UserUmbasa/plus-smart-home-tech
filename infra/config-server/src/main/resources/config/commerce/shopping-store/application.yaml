@@ -17,6 +17,7 @@ spring:
       hibernate:
         default_schema: store
         format_sql: true
+
     show-sql: true  # Добавляем здесь
     logging: # Добавляем секцию логирования
       level:
