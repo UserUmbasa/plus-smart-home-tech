@@ -30,7 +30,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name="warehouse_products")
+@Table(name="warehouse.warehouse_products")
 public class WarehouseProduct {
     @Id
     @Column(name = "product_id")

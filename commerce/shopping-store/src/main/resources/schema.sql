@@ -1,6 +1,6 @@
-CREATE SCHEMA IF NOT EXISTS products;
+CREATE SCHEMA IF NOT EXISTS store;
 
-CREATE TABLE IF NOT EXISTS products (
+CREATE TABLE IF NOT EXISTS store.products (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     product_name VARCHAR(50) NOT NULL,
     description VARCHAR(500) NOT NULL,
