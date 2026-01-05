@@ -2,7 +2,6 @@ package ru.yandex.practicum.model;
 
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
@@ -42,7 +41,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
-@Table(name = "store.products")
+@Table(name = "products")
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

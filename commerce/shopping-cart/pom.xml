@@ -84,6 +84,11 @@
             <artifactId>spring-retry</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
+        </dependency>
+
         <!-- Eureka Client для обнаружения сервисов в микросервисной архитектуре -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

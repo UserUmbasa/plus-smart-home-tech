@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Table(name = "cart.carts")
+@Table(name = "carts")
 public class ShoppingCart {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,7 +24,7 @@ public class ShoppingCart {
     @Column(nullable = false)
     private Boolean active = true;
     @ElementCollection
-    @CollectionTable(name = "cart.cart_products", joinColumns = @JoinColumn(name = "cart_id"))
+    @CollectionTable(name = "cart_products", joinColumns = @JoinColumn(name = "cart_id"))
     @MapKeyColumn(name = "product_id")
     @Column(name = "quantity")
     private Map<UUID, Integer> products = new HashMap<>();

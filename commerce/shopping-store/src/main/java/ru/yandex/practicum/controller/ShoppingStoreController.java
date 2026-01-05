@@ -9,9 +9,9 @@ import ru.yandex.practicum.api.shoppingStore.ShoppingStoreOperations;
 import ru.yandex.practicum.dto.shoppingStore.ProductCategory;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
 import ru.yandex.practicum.dto.shoppingStore.QuantityState;
+import ru.yandex.practicum.dto.shoppingStore.ProductPageDto;
 import ru.yandex.practicum.service.ShoppingStoreService;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -32,7 +32,7 @@ public class ShoppingStoreController implements ShoppingStoreOperations {
     }
 
     @Override
-    public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
+    public ProductPageDto getProducts(ProductCategory category, Pageable pageable) {
         return shoppingStoreService.getProducts(category, pageable);
     }
 

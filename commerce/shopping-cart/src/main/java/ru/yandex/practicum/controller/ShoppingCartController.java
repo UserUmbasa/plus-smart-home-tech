@@ -8,7 +8,6 @@ import ru.yandex.practicum.api.shoppingCart.ShoppingCartOperations;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.service.ShoppingCartService;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -20,31 +19,28 @@ import java.util.UUID;
 public class ShoppingCartController implements ShoppingCartOperations {
     private final ShoppingCartService shoppingCartService;
 
-    @Override
+    @Override // @GetMapping
     public ShoppingCartDto getShoppingCart(String username) {
         return shoppingCartService.getShoppingCart(username);
     }
 
-    @Override
+    @Override // @PutMapping
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
         return shoppingCartService.addProductToShoppingCart(username, products);
     }
 
-    @Override
+    @Override // @DeleteMapping
     public void deactivateCurrentShoppingCart(String username) {
         shoppingCartService.deactivateCurrentShoppingCart(username);
     }
 
-    @Override
+    @Override // @PostMapping("/remove")
     public ShoppingCartDto removeFromShoppingCart(String username, List<UUID> products) {
         return shoppingCartService.removeFromShoppingCart(username, products);
     }
 
-    @Override
+    @Override // @PostMapping("/change-quantity")
     public ShoppingCartDto changeProductQuantity(String username, ChangeProductQuantityRequest request) {
-        log.info("POST /api/v1/shopping-cart/change-quantity - Изменить количество товаров в корзине пользователя {}", username);
-        ShoppingCartDto response = shoppingCartService.changeProductQuantity(username, request);
-        log.info("Возвращаем корзину: {}", response);
-        return response;
+        return shoppingCartService.changeProductQuantity(username, request);
     }
 }

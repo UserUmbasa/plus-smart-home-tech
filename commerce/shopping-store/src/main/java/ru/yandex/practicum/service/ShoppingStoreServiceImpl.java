@@ -10,7 +10,6 @@ import ru.yandex.practicum.exception.ProductNotFoundException;
 import ru.yandex.practicum.mapper.ProductMapper;
 import ru.yandex.practicum.model.Product;
 import ru.yandex.practicum.repository.ProductRepository;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -63,13 +62,14 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ProductDto> getProducts(ProductCategory category, Pageable pageable) {
+    public ProductPageDto getProducts(ProductCategory category, Pageable pageable) {
         log.debug("Запрашиваем товары с категорией - {} и пагинацией - {}", category, pageable);
         List<Product> products = productRepository.findAllByProductCategory(category, pageable).getContent();
         log.debug("Получили из DB список товаров размером {}", products.size());
-        return products.stream()
+        List<ProductDto> productsDto = products.stream()
                 .map(productMapper::mapToProductDto)
                 .toList();
+        return new ProductPageDto(productsDto, pageable.getSort());
     }
 
     @Transactional
