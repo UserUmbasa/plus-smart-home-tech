@@ -1,41 +1,21 @@
-kafka:
-  topics:
-    snapshots: "telemetry.snapshots.v1"
-    hubs: "telemetry.hubs.v1"
-  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-  hub-consumer-properties:
-    group-id: analyzer-hub-group
-    value-deserializer: ru.yandex.practicum.deserializer.HubEventDeserializer
-  snapshot-consumer-properties:
-    group-id: analyzer-snapshot-group
-    value-deserializer: ru.yandex.practicum.deserializer.SensorsSnapshotDeserializer
-  bootstrap-servers: localhost:9092
-  consumer:
-    enable-auto-commit: false
-
-grpc:
-  client:
-    hub-router:
-      address: 'static://localhost:59090'
-      enableKeepAlive: true
-      keepAliveWithoutCalls: true
-      negotiationType: plaintext
-
-
 spring:
-  datasource:
-    driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://localhost:5432/analyzer"
-    username: "postgres"
-    password: "12345"
-  sql:
-    init:
-      data-locations: classpath:schema.sql
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        jdbc:
-          time_zone: UTC
+  application:
+    name: analyzer
+  config:
+    # import: configserver:http://localhost:8888 Указывает на расположение Config Server, если напрямую
+    import: "configserver:"  # используем Service Discovery
+
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
+
+# Настройки Eureka клиента
+eureka:
+  client:
+    serviceUrl:  # URL для связи с Eureka сервером
+      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
+      # Используются переменные для гибкости настройки хоста и порта
+      # По умолчанию используется localhost:8761
