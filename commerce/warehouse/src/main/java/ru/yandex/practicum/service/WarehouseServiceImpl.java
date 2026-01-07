@@ -52,6 +52,13 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Transactional
     @Override
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto cartDto) {
+// // Имитация медленного ответа. Позже удалю
+//        try {
+//            Thread.sleep(5000);
+//        } catch (InterruptedException e) {
+//            Thread.currentThread().interrupt();
+//        }
+
         log.info("Запрашиваем товары из корзины {}", cartDto);
         Map<UUID, Integer> products = cartDto.getProducts();
         log.info("Запрашиваем количество доступных товаров на складе {}", products.keySet());

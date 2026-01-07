@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.yandex.practicum.api.warehouse.WarehouseOperations;
+import ru.yandex.practicum.api.warehouse.WarehouseClient;
 import ru.yandex.practicum.dto.shoppingCart.ChangeProductQuantityRequest;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
@@ -14,7 +14,6 @@ import ru.yandex.practicum.exception.InactiveShoppingCartException;
 import ru.yandex.practicum.mapper.CartMapper;
 import ru.yandex.practicum.model.ShoppingCart;
 import ru.yandex.practicum.repository.CartRepository;
-
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -23,9 +22,11 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ShoppingCartServiceImpl implements ShoppingCartService {
-    private final CartRepository cartRepository;
+    private final CartRepository cartRepository; // WarehouseFeignClientFallback
     private final CartMapper cartMapper;
-    private final WarehouseOperations warehouseClient;
+    private final WarehouseClient warehouseClient;
+
+
 
     @Transactional
     @Override
@@ -37,7 +38,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return cartMapper.mapToCartDto(cart);
     }
 
-    @Transactional
+    //@Transactional
     @Override
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
         log.info("Начал работать метод addProduct, на вход пришло username:{}, {}", username, products);
@@ -94,7 +95,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return cartMapper.mapToCartDto(cart);
     }
 
-    @Transactional
+    //@Transactional
     @Override
     public ShoppingCartDto changeProductQuantity(String username, ChangeProductQuantityRequest request) {
         validateUsername(username);

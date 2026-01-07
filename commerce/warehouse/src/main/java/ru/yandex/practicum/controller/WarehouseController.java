@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.api.warehouse.WarehouseOperations;
+import ru.yandex.practicum.api.warehouse.WarehouseClient;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
 import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
@@ -16,7 +16,7 @@ import ru.yandex.practicum.service.WarehouseService;
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/warehouse")
-public class WarehouseController implements WarehouseOperations {
+public class WarehouseController implements WarehouseClient {
     private final WarehouseService warehouseService;
 
     @Override

@@ -18,16 +18,38 @@ spring:
         default_schema: cart
         format_sql: true
 
-    show-sql: true  # Добавляем здесь
-    logging: # Добавляем секцию логирования
-      level:
-        org:
-          hibernate:
-            SQL: DEBUG
-            type:
-              descriptor:
-                sql:
-                  BasicBinder: TRACE
+#    show-sql: true
+#    logging:
+#      level:
+#        org:
+#          hibernate:
+#            SQL: DEBUG
+#            type:
+#              descriptor:
+#                sql:
+#                  BasicBinder: TRACE
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      warehouse:
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 2 #5
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+
+  timelimiter:
+    instances:
+      warehouse:
+        timeout-duration: 3s
+
+feign:
+  circuitbreaker:
+    enabled: true
 
 server:
   port : 0 #55947
