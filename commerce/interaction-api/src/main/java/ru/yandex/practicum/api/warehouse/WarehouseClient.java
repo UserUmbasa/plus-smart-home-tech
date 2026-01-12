@@ -1,6 +1,7 @@
 package ru.yandex.practicum.api.warehouse;
 
 import jakarta.validation.Valid;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +15,7 @@ import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 
 @FeignClient(name = "warehouse",
         path = "/api/v1/warehouse",
-        fallback = WarehouseFeignClientFallback.class,
-        configuration = FeignConfig.class)
-//@CircuitBreaker(name = "warehouse") «конфликт» двух разных механизмов: OpenFeign Fallback и Resilience4j AOP (@CircuitBreaker).
-//@Primary
+        fallbackFactory = WarehouseFeignClientFallbackFactory.class)
 public interface WarehouseClient {
 
     @PutMapping
