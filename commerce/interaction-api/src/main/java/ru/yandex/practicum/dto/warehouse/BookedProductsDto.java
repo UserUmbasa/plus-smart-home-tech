@@ -22,6 +22,4 @@ public class BookedProductsDto {
     private Double deliveryVolume = 0.0;
     @NotNull
     private Boolean fragile = false;
-
-    private String error;
 }

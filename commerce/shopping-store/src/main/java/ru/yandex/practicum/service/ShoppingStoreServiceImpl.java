@@ -34,10 +34,10 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     public ProductDto updateProduct(ProductDto productDto) {
         log.debug("Обновляем товар в DB - {}", productDto);
-        Product product = findProductByIdOrThrow(productDto.getProductId());
-        productRepository.save(productMapper.mapToProduct(productDto));
-        log.debug("Обновили товар в DB - {}", product);
-        return productMapper.mapToProductDto(product);
+        findProductByIdOrThrow(productDto.getProductId());
+        Product result = productRepository.save(productMapper.mapToProduct(productDto));
+        log.debug("Обновили товар в DB - {}", result);
+        return productMapper.mapToProductDto(result);
     }
 
     @Transactional

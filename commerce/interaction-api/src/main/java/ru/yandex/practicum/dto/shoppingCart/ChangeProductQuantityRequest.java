@@ -1,5 +1,6 @@
 package ru.yandex.practicum.dto.shoppingCart;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -20,5 +21,6 @@ public class ChangeProductQuantityRequest {
     @NotNull
     private UUID productId;
     @NotNull
+    @Min(1)
     private Integer newQuantity;
 }

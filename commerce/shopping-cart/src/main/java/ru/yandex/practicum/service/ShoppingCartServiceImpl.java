@@ -29,32 +29,25 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
 
     @Transactional
-    @Override
+    @Override // запрос корзины по имени юзера
     public ShoppingCartDto getShoppingCart(String username) {
         validateUsername(username);
-        log.info("Запрашиваем актуальную корзину для пользователя {}", username);
-        ShoppingCart cart = getOrCreateShoppingCart(username);
-        log.info("Получили корзину");
+        ShoppingCart cart = getOrCreateShoppingCart(username);;
         return cartMapper.mapToCartDto(cart);
     }
 
-    //@Transactional
+    @Transactional
     @Override
     public ShoppingCartDto addProductToShoppingCart(String username, Map<UUID, Integer> products) {
-        log.info("Начал работать метод addProduct, на вход пришло username:{}, {}", username, products);
         validateUsername(username);
-        log.info("Запрашиваем актуальную корзину для пользователя {}", username);
         ShoppingCart cart = getOrCreateShoppingCart(username);
         checkCartIsActive(cart);
         Map<UUID, Integer> oldProducts = cart.getProducts();
         oldProducts.putAll(products);
         cart.setProducts(oldProducts);
         log.info("Добавили продукты в корзину");
-
         //проверить товары на складе
         BookedProductsDto bookedProductsDto = warehouseClient.checkProductQuantityEnoughForShoppingCart(cartMapper.mapToCartDto(cart));
-        log.info("Проверили наличие товаров на складе, параметры заказа: {}", bookedProductsDto);
-
         cartRepository.save(cart);
         log.info("Сохранили обновленную корзину");
         return cartMapper.mapToCartDto(cart);
@@ -64,11 +57,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public void deactivateCurrentShoppingCart(String username) {
         validateUsername(username);
-        log.info("Запрашиваем актуальную корзину для пользователя {}", username);
         ShoppingCart cart = getOrCreateShoppingCart(username);
         checkCartIsActive(cart);
         cart.setActive(false);
-        log.info("Деактивировали корзину");
         cartRepository.save(cart);
         log.info("Сохранили деактивированную корзину");
     }
@@ -77,29 +68,22 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     @Override
     public ShoppingCartDto removeFromShoppingCart(String username, List<UUID> products) {
         validateUsername(username);
-        log.info("Запрашиваем актуальную корзину для пользователя {}", username);
         ShoppingCart cart = getOrCreateShoppingCart(username);
         checkCartIsActive(cart);
         Map<UUID, Integer> oldProducts = cart.getProducts();
         for (UUID idToRemove : products) {
-            if (oldProducts.containsKey(idToRemove)) {
-                oldProducts.remove(idToRemove);
-            } else {
-                throw new NoProductsInShoppingCartException("Такого продукта нет в корзине");
-            }
+            oldProducts.remove(idToRemove);
         }
         cart.setProducts(oldProducts);
-        log.info("Удалили продукты из корзины");
         cartRepository.save(cart);
         log.info("Сохранили обновленную корзину");
         return cartMapper.mapToCartDto(cart);
     }
 
-    //@Transactional
+    @Transactional
     @Override
     public ShoppingCartDto changeProductQuantity(String username, ChangeProductQuantityRequest request) {
         validateUsername(username);
-        log.info("Запрашиваем актуальную корзину для пользователя {}", username);
         ShoppingCart cart = getOrCreateShoppingCart(username);
         checkCartIsActive(cart);
         Map<UUID, Integer> oldProducts = cart.getProducts();
@@ -109,11 +93,9 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
             throw new NoProductsInShoppingCartException("Такого продукта нет в корзине");
         }
         cart.setProducts(oldProducts);
-        log.info("Изменили количество продукта в корзине");
 
         //проверить товары на складе
         BookedProductsDto bookedProductsDto = warehouseClient.checkProductQuantityEnoughForShoppingCart(cartMapper.mapToCartDto(cart));
-        log.info("Проверили наличие товаров на складе, параметры заказа: {}", bookedProductsDto);
 
         cartRepository.save(cart);
         log.info("Сохранили обновленную корзину");

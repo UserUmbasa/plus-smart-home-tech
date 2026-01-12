@@ -18,17 +18,17 @@ spring:
         default_schema: warehouse
         format_sql: true
 
-    show-sql: true  # Добавляем здесь
-    logging: # Добавляем секцию логирования
-      level:
-        org:
-          hibernate:
-            SQL: DEBUG
-            type:
-              descriptor:
-                sql:
-                  BasicBinder: TRACE
+#    show-sql: true  # Добавляем здесь
+#    logging: # Добавляем секцию логирования
+#      level:
+#        org:
+#          hibernate:
+#            SQL: DEBUG
+#            type:
+#              descriptor:
+#                sql:
+#                  BasicBinder: TRACE
 
 server:
-  port : 0 #12345 #59944 #0
+  port : 0 #63524
 
