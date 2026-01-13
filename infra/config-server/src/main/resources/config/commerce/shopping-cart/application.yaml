@@ -1,0 +1,62 @@
+spring:
+  application:
+    name: shopping-cart
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true  # <--- ВКЛЮЧАЕТ интеграцию Feign с Resilience4j
+
+  sql:
+    init:
+      mode: always
+  datasource:
+    driverClassName: "org.postgresql.Driver"
+    url: "jdbc:postgresql://localhost:6432/smart-home-commerce-cart"
+    username: "username"
+    password: "password"
+  jpa:
+    hibernate:
+      ddl-auto: create-drop #none
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        default_schema: cart
+        format_sql: true
+
+#    show-sql: true
+#    logging:
+#      level:
+#        org:
+#          hibernate:
+#            SQL: DEBUG
+#            type:
+#              descriptor:
+#                sql:
+#                  BasicBinder: TRACE
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      warehouse:
+        ignore-exceptions: # Добавил, чтобы 400 ошибки не ломали схему, не помогает
+          - ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse
+          - feign.FeignException.BadRequest
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2s
+        wait-duration-in-open-state: 10s
+        permitted-number-of-calls-in-half-open-state: 3
+        minimum-number-of-calls: 5 #2
+        sliding-window-type: COUNT_BASED
+        sliding-window-size: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+
+  timelimiter:
+    instances:
+      warehouse:
+        timeout-duration: 60s #3
+
+
+server:
+  port : 0 #63554
+

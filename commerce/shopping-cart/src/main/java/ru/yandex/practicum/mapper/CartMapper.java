@@ -1,0 +1,14 @@
+package ru.yandex.practicum.mapper;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingConstants;
+import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
+import ru.yandex.practicum.model.ShoppingCart;
+
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+public interface CartMapper {
+
+    ShoppingCart mapToCart(ShoppingCartDto cartDto);
+
+    ShoppingCartDto mapToCartDto(ShoppingCart cart);
+}
