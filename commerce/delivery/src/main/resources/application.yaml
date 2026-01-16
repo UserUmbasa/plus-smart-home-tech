@@ -1,6 +1,6 @@
 spring:
   application:
-    name: warehouse
+    name: delivery
 
   config:
   # import: configserver:http://localhost:8888 Указывает на расположение Config Server, если напрямую
@@ -18,5 +18,3 @@ eureka:
   client:
     serviceUrl:  # URL для связи с Eureka сервером
       defaultZone: http://localhost:8761/eureka/
-      # Используются переменные для гибкости настройки хоста и порта
-      # По умолчанию используется localhost:8761

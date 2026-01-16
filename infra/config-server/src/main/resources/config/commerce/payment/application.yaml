@@ -1,12 +1,12 @@
 spring:
   application:
-    name: warehouse
+    name: payment
   sql:
     init:
       mode: always
   datasource:
     driverClassName: "org.postgresql.Driver"
-    url: "jdbc:postgresql://localhost:6435/smart-home-commerce-warehouse"
+    url: "jdbc:postgresql://localhost:6437/smart-home-commerce-payment"
     username: "username"
     password: "password"
   jpa:
@@ -15,8 +15,19 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
-        default_schema: warehouse
+        default_schema: payments
         format_sql: true
+
+    show-sql: true  # Добавляем здесь
+    logging: # Добавляем секцию логирования
+        level:
+          org:
+            hibernate:
+              SQL: DEBUG
+              type:
+                descriptor:
+                  sql:
+                    BasicBinder: TRACE
 
 eureka:
   instance:
@@ -27,17 +38,3 @@ eureka:
 
 server:
   port : 0 #63524
-
-
-
-
-#    show-sql: true  # Добавляем здесь
-#    logging: # Добавляем секцию логирования
-#      level:
-#        org:
-#          hibernate:
-#            SQL: DEBUG
-#            type:
-#              descriptor:
-#                sql:
-#                  BasicBinder: TRACE
