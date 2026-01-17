@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
@@ -28,6 +25,7 @@ public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
     private final AddressDto warehouseAddress = initAddress();
+    private final WarehouseMapper mapper;
 
 
     @Transactional
@@ -93,6 +91,34 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Override
     public AddressDto getWarehouseAddress() {
         return warehouseAddress;
+    }
+
+    @Transactional
+    @Override // Собрать товары к заказу для подготовки к отправке.
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        BookedProductsDto result = checkProductQuantityEnoughForShoppingCart(mapper.mapToShoppingCartDto(request));
+        Map<UUID, Integer> products = request.getProducts();
+        for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
+            UUID id = entry.getKey();
+            Integer quantity = entry.getValue();
+            warehouseRepository.decreaseQuantity(id, quantity);
+        }
+        log.info("Товары к заказу для передачи в доставку собраны");
+        return result;
+    }
+
+    @Override // Передать товары в доставку.
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+
+    }
+
+    @Transactional
+    @Override
+    public void acceptReturn(Map<UUID, Integer> productsToReturn) {
+        productsToReturn.forEach((id, amount) ->
+                addProductToWarehouse(new AddProductToWarehouseRequest(id, amount))
+        );
+        log.info("Возврат товара на склад: {}",productsToReturn);
     }
 
     private AddressDto initAddress() {

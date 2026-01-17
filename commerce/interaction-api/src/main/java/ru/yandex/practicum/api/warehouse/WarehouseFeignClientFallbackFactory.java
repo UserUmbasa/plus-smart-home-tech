@@ -5,12 +5,12 @@ import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 import lombok.extern.slf4j.Slf4j;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.WarehouseServiceException;
+
+import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -40,6 +40,21 @@ public class WarehouseFeignClientFallbackFactory implements FallbackFactory<Ware
                 public AddressDto getWarehouseAddress() {
                     throw (RuntimeException) cause;
                 }
+
+                @Override
+                public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+                    throw (RuntimeException) cause;
+                }
+
+                @Override
+                public void shippedToDelivery(ShippedToDeliveryRequest request) {
+                    throw (RuntimeException) cause;
+                }
+
+                @Override
+                public void acceptReturn(Map<UUID, Integer> productsToReturn) {
+                    throw (RuntimeException) cause;
+                }
             };
         }
 
@@ -63,6 +78,21 @@ public class WarehouseFeignClientFallbackFactory implements FallbackFactory<Ware
 
             @Override
             public AddressDto getWarehouseAddress() {
+                throw new WarehouseServiceException("Сервис склада временно недоступен");
+            }
+
+            @Override
+            public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+                throw new WarehouseServiceException("Сервис склада временно недоступен");
+            }
+
+            @Override
+            public void shippedToDelivery(ShippedToDeliveryRequest request) {
+                throw new WarehouseServiceException("Сервис склада временно недоступен");
+            }
+
+            @Override
+            public void acceptReturn(Map<UUID, Integer> productsToReturn) {
                 throw new WarehouseServiceException("Сервис склада временно недоступен");
             }
         };
