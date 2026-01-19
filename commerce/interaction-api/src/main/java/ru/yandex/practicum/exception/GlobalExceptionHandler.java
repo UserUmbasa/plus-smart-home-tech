@@ -43,4 +43,16 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    // Обработка ошибки расчёта стоимости товаров
+    @ExceptionHandler(NotEnoughInfoInOrderToCalculateException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotEnoughInfoError(NotEnoughInfoInOrderToCalculateException ex) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.BAD_REQUEST.value(), // 400
+                "NOT_ENOUGH_INFO_FOR_CALCULATION", // Уникальный код ошибки
+                "Ошибка, Недостаточно информации в заказе для расчёта", // Сообщение об ошибке
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }

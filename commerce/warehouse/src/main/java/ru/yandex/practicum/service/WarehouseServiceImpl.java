@@ -10,7 +10,9 @@ import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.mapper.WarehouseMapper;
+import ru.yandex.practicum.model.OrderBooking;
 import ru.yandex.practicum.model.WarehouseProduct;
+import ru.yandex.practicum.repository.BookingRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 
 import java.security.SecureRandom;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
+    private final BookingRepository bookingRepository;
     private final WarehouseMapper warehouseMapper;
     private final AddressDto warehouseAddress = initAddress();
     private final WarehouseMapper mapper;
@@ -101,15 +104,24 @@ public class WarehouseServiceImpl implements WarehouseService {
         for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
             UUID id = entry.getKey();
             Integer quantity = entry.getValue();
-            warehouseRepository.decreaseQuantity(id, quantity);
+            warehouseRepository.decreaseQuantity(id, quantity); // уменьшили остаток
         }
+        // сохранили в БД
+        OrderBooking orderBooking = new OrderBooking();
+        orderBooking.setOrderId(request.getOrderId());
+        orderBooking.setProducts(products);
+        bookingRepository.save(orderBooking);
+
         log.info("Товары к заказу для передачи в доставку собраны");
         return result;
     }
 
-    @Override // Передать товары в доставку.
+    @Transactional
+    @Override // Передать товары в доставку. Вызывается из сервиса доставки
     public void shippedToDelivery(ShippedToDeliveryRequest request) {
-
+        OrderBooking orderBooking = bookingRepository.findByOrderId(request.getOrderId());
+        orderBooking.setDeliveryId(request.getDeliveryId());
+        bookingRepository.save(orderBooking);
     }
 
     @Transactional

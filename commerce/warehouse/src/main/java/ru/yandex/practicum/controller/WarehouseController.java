@@ -44,9 +44,9 @@ public class WarehouseController implements WarehouseClient {
         return warehouseService.assemblyProductsForOrder(request);
     }
 
-    @Override // POST /api/v1/warehouse/shipped - Передать товары в доставку
+    @Override // POST /api/v1/warehouse/shipped - Передать товары в доставку. Вызывается из сервиса доставки
     public void shippedToDelivery(ShippedToDeliveryRequest request) {
-
+        warehouseService.shippedToDelivery(request);
     }
 
     @Override // POST /api/v1/warehouse/return - Принять возврат товаров на склад
