@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS warehouse_products (
 );
 
 CREATE TABLE IF NOT EXISTS warehouse.bookings (
-    booking_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    booking_id UUID NOT NULL PRIMARY KEY,
     order_id UUID NOT NULL,
     delivery_id UUID
 );

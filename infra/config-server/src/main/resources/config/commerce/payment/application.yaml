@@ -15,7 +15,7 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     properties:
       hibernate:
-        default_schema: payments
+        default_schema: payment
         format_sql: true
 
     show-sql: true  # Добавляем здесь

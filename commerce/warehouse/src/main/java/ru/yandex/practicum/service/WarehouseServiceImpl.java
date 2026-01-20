@@ -134,14 +134,12 @@ public class WarehouseServiceImpl implements WarehouseService {
     }
 
     private AddressDto initAddress() {
-        final String[] addresses = new String[]{"ADDRESS_1", "ADDRESS_2"};
-        final String address = addresses[Random.from(new SecureRandom()).nextInt(0, addresses.length)];
         return AddressDto.builder()
-                .city(address)
-                .street(address)
-                .house(address)
-                .country(address)
-                .flat(address)
+                .city("Отговорск")
+                .street("Тупик Отмазок")
+                .house("Не я")
+                .country("Великое Королевство Отлагательств")
+                .flat("Не знаю")
                 .build();
     }
 }

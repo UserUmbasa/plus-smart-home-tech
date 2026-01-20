@@ -72,7 +72,7 @@ public class DeliveryServiceImpl implements DeliveryService {
 
     @Override
     public void deliverySuccessful(UUID orderId) {
-
+        System.err.println("true");
     }
 
     @Override

@@ -2,6 +2,7 @@ package ru.yandex.practicum.dto.payment;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /**
@@ -25,17 +26,17 @@ public class PaymentDto {
      * Общая сумма платежа
      * Включает в себя все компоненты оплаты
      */
-    private Double totalPayment;
+    private BigDecimal totalPayment;
 
     /**
      * Сумма за доставку
      * Стоимость услуг доставки
      */
-    private Double deliveryTotal;
+    private BigDecimal deliveryTotal;
 
     /**
      * Сумма дополнительных сборов
      * Включает комиссии и другие дополнительные платежи
      */
-    private Double feeTotal;
+    private BigDecimal feeTotal;
 }

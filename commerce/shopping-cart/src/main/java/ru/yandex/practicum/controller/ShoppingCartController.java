@@ -43,4 +43,9 @@ public class ShoppingCartController implements ShoppingCartOperations {
     public ShoppingCartDto changeProductQuantity(String username, ChangeProductQuantityRequest request) {
         return shoppingCartService.changeProductQuantity(username, request);
     }
+
+    @Override // проверка корзины юзера
+    public String getUsernameById(UUID cartId) {
+        return shoppingCartService.getUsernameById(cartId);
+    }
 }

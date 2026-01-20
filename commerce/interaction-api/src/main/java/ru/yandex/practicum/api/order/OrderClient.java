@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.dto.order.OrderRequestDto;
 import ru.yandex.practicum.dto.order.OrderResponseDto;
 
-@FeignClient(name = "client", url = "/api/v1/client")
+@FeignClient(name = "order", path = "/api/v1/order")
 public interface OrderClient {
 
     @PutMapping

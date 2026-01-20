@@ -1,15 +1,16 @@
 package ru.yandex.practicum.service;
 
-import lombok.AllArgsConstructor;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.api.shoppingStore.ShoppingStoreOperations;
-import ru.yandex.practicum.dto.delivery.DeliveryDto;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
+import ru.yandex.practicum.dto.payment.PaymentState;
 import ru.yandex.practicum.dto.shoppingStore.ProductDto;
+import ru.yandex.practicum.exception.NoOrderFoundException;
 import ru.yandex.practicum.exception.NotEnoughInfoInOrderToCalculateException;
 import ru.yandex.practicum.model.Payment;
 import ru.yandex.practicum.repository.PaymentRepository;
@@ -24,6 +25,7 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final ShoppingStoreOperations shoppingStore;
+
 
     private static final BigDecimal NDS_MULTIPLIER = BigDecimal.valueOf(0.1); // 10% налог
 
@@ -72,22 +74,48 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setTotalPayment(totalCost);
         payment.setDeliveryTotal(deliveryTotal);
         payment.setOrderId(orderDto.getOrderId());
+
         payment = paymentRepository.save(payment);
 
         PaymentDto result = new PaymentDto();
         result.setPaymentId(payment.getPaymentId());
+        result.setTotalPayment(payment.getTotalPayment());
+        result.setDeliveryTotal(payment.getDeliveryTotal());
+        result.setFeeTotal(payment.getFeeTotal());
 
-        return null;
+        return result;
     }
 
     @Override // Метод для эмуляции успешной оплаты платежного шлюза
     public void paymentSuccess(UUID paymentId) {
+        try {
+            Payment payment = paymentRepository.findById(paymentId)
+                    .orElseThrow(() -> new NoOrderFoundException("Оплата не найдена"));
+            // изменить статус на SUCCESS
+            payment.setPaymentState(PaymentState.SUCCESS);
+            paymentRepository.save(payment);
+            // Здесь дальнейшая обработка платежа !!!! сервис заказов
 
+        } catch (NoOrderFoundException e) {
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        log.info("Успешная оплата заказа");
     }
 
     @Override // Метод для эмуляции отказа в оплате платежного шлюза
     public void paymentFailed(UUID paymentId) {
+        try {
+            Payment payment = paymentRepository.findById(paymentId)
+                    .orElseThrow(() -> new NoOrderFoundException("Оплата не найдена"));
+            // изменить статус на FAILED
+            payment.setPaymentState(PaymentState.FAILED);
+            paymentRepository.save(payment);
+            // Здесь дальнейшая обработка платежа !!!! сервис заказов
 
+        } catch (NoOrderFoundException e) {
+            throw new NoOrderFoundException(e.getMessage());
+        }
+        log.info("Отказ в оплате заказа");
     }
 
     private BigDecimal calculatePriceWithTax(BigDecimal basePrice) {

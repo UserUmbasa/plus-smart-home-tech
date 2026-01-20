@@ -16,11 +16,19 @@ spring:
         locator:
           enabled: true
       routes:
-        # ---- заказы ----
+        # ---- доставка ----
         - id: delivery_service_route
           uri: lb://delivery
           predicates:
             - Path=/delivery/**
+          filters:
+            - PrefixPath=/api/v1
+
+        # ---- оплата ----
+        - id: payment_service_route
+          uri: lb://payment
+          predicates:
+            - Path=/payment/**
           filters:
             - PrefixPath=/api/v1
 
@@ -56,18 +64,6 @@ spring:
             - Path=/shopping-store/**
           filters:
             - PrefixPath=/api/v1
-            - name: Retry
-              args:
-                retries: 3
-                statuses:
-                  - NOT_FOUND
-                methods:
-                  - POST, GET
-                backoff:
-                  firstBackoff: 500ms
-                  maxBackoff: 2s
-                  factor: 2
-                  basedOnPreviousValue: true
 
 resilience4j:
   circuitbreaker:

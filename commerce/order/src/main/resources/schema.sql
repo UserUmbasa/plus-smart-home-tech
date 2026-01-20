@@ -1,7 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS orders;
 
 CREATE TABLE IF NOT EXISTS orders.orders (
-    order_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    order_id UUID NOT NULL PRIMARY KEY,
     order_state VARCHAR(10) NOT NULL,
     shopping_cart_id UUID NOT NULL,
     username VARCHAR(100),
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS orders.orders (
     fragile BOOLEAN,
     total_price DOUBLE PRECISION,
     delivery_price DOUBLE PRECISION,
-    product_price DOUBLE PRECISION,
+    product_price DOUBLE PRECISION
 );
 
 CREATE TABLE IF NOT EXISTS orders.order_products (

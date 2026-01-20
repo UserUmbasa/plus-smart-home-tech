@@ -55,4 +55,28 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
+
+    // Обработка ошибки заказа
+    @ExceptionHandler(NoOrderFoundException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoOrderFoundException(NoOrderFoundException ex) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.NOT_FOUND.value(), // 404
+                "ORDER_NOT_FOUND",
+                "Оплата не найдена",
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    // Обработка ошибки авторизации
+    @ExceptionHandler(NotAuthorizedUserException.class)
+    public ResponseEntity<ErrorResponseDto> handleNotAuthorizedUserException(NotAuthorizedUserException ex) {
+        ErrorResponseDto error = new ErrorResponseDto(
+                HttpStatus.UNAUTHORIZED.value(), // 401 для ошибки авторизации
+                "UNAUTHORIZED_USER",
+                "Пользователь не авторизован",
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
+    }
 }

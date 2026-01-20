@@ -38,17 +38,3 @@ eureka:
 
 server:
   port : 0 #63524
-
-
-
-
-#    show-sql: true  # Добавляем здесь
-#    logging: # Добавляем секцию логирования
-#      level:
-#        org:
-#          hibernate:
-#            SQL: DEBUG
-#            type:
-#              descriptor:
-#                sql:
-#                  BasicBinder: TRACE

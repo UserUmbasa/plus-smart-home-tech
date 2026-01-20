@@ -13,7 +13,7 @@
 
     <!-- Идентификатор текущего модуля -->
     <artifactId>payment</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+
 
     <!-- Настройки компилятора и кодировки -->
     <properties>

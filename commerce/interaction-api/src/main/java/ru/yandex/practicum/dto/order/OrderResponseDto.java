@@ -1,5 +1,6 @@
 package ru.yandex.practicum.dto.order;
 
+import lombok.Data;
 import ru.yandex.practicum.dto.warehouse.AddressDto;
 
 import java.math.BigDecimal;
@@ -7,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.UUID;
 
+@Data
 public class OrderResponseDto {
     private UUID orderId;
     private UUID shoppingCartId;

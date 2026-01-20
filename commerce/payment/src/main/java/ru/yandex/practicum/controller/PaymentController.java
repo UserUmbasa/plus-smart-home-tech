@@ -15,7 +15,7 @@ import java.util.UUID;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/delivery")
+@RequestMapping("/api/v1/payment")
 public class PaymentController implements PaymentOperations {
     private final PaymentService paymentService;
 
