@@ -41,6 +41,6 @@ public class PaymentController implements PaymentOperations {
 
     @Override // POST api/v1/payment/failed - Метод для эмуляции отказа в оплате платежного шлюза
     public void paymentFailed(UUID paymentId) {
-
+        paymentService.paymentFailed(paymentId);
     }
 }

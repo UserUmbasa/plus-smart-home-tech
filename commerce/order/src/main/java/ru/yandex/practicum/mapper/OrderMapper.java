@@ -4,16 +4,16 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 import ru.yandex.practicum.dto.order.OrderRequestDto;
-import ru.yandex.practicum.dto.order.OrderResponseDto;
+import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
 import ru.yandex.practicum.model.Order;
 
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface OrderMapper {
 
-    OrderResponseDto mapToResponseDto(Order order);
+    @Mapping(target = "state", source = "orderState")
+    OrderDto mapToOrderDto(Order order);
 
     @Mapping(target = "orderId", ignore = true)
     @Mapping(target = "products", source = "request.shoppingCart.products")

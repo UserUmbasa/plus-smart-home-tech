@@ -1,6 +1,5 @@
 package ru.yandex.practicum.dto.order;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -17,7 +16,7 @@ import java.util.UUID;
  *     <li>{@code products} - обязательный список товаров заказа с указанием количества</li>
  *     <li>{@code paymentId} - идентификатор платёжной операции</li>
  *     <li>{@code deliveryId} - идентификатор доставки</li>
- *     <li>{@code orderState} - текущее состояние заказа</li>
+ *     <li>{@code state} - текущее состояние заказа</li>
  *     <li>{@code deliveryWeight} - общий вес товаров в заказе</li>
  *     <li>{@code deliveryVolume} - общий объём товаров в заказе</li>
  *     <li>{@code fragile} - флаг хрупкости товаров</li>
@@ -28,70 +27,17 @@ import java.util.UUID;
  */
 @Data
 public class OrderDto {
-    /**
-     * Уникальный идентификатор заказа
-     * {@code @NotNull} - поле обязательно должно быть заполнено
-     */
-    @NotNull
     private UUID orderId;
-
-    /**
-     * Идентификатор корзины, из которой сформирован заказ
-     */
     private UUID shoppingCartId;
-
-    /**
-     * Список товаров заказа с указанием количества
-     * {@code @NotNull} - поле обязательно должно быть заполнено
-     * <p>
-     * Ключом является идентификатор товара, значением - количество единиц товара
-     */
-    @NotNull
     private Map<UUID, Integer> products;
-
-    /**
-     * Идентификатор платёжной операции
-     */
     private UUID paymentId;
-
-    /**
-     * Идентификатор доставки
-     */
     private UUID deliveryId;
-
-    /**
-     * Текущее состояние заказа
-     */
-    private OrderState orderState;
-
-    /**
-     * Общий вес товаров в заказе
-     */
+    private OrderState state;
     private Double deliveryWeight;
-
-    /**
-     * Общий объём товаров в заказе
-     */
     private Double deliveryVolume;
-
-    /**
-     * Флаг хрупкости товаров
-     * Указывает на наличие хрупких товаров в заказе
-     */
     private Boolean fragile;
-
-    /**
-     * Итоговая стоимость заказа
-     */
     private BigDecimal totalPrice;
-
-    /**
-     * Стоимость доставки
-     */
     private BigDecimal deliveryPrice;
-
-    /**
-     * Суммарная стоимость всех товаров
-     */
     private BigDecimal productPrice;
+    private String username;
 }

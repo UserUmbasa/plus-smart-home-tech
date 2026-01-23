@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.yandex.practicum.api.order.OrderOperations;
 import ru.yandex.practicum.api.shoppingStore.ShoppingStoreOperations;
 import ru.yandex.practicum.dto.order.OrderDto;
 import ru.yandex.practicum.dto.payment.PaymentDto;
@@ -25,7 +26,7 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final ShoppingStoreOperations shoppingStore;
-
+    private final OrderOperations orderOperations;
 
     private static final BigDecimal NDS_MULTIPLIER = BigDecimal.valueOf(0.1); // 10% налог
 
@@ -94,8 +95,6 @@ public class PaymentServiceImpl implements PaymentService {
             // изменить статус на SUCCESS
             payment.setPaymentState(PaymentState.SUCCESS);
             paymentRepository.save(payment);
-            // Здесь дальнейшая обработка платежа !!!! сервис заказов
-
         } catch (NoOrderFoundException e) {
             throw new NoOrderFoundException(e.getMessage());
         }
@@ -110,12 +109,12 @@ public class PaymentServiceImpl implements PaymentService {
             // изменить статус на FAILED
             payment.setPaymentState(PaymentState.FAILED);
             paymentRepository.save(payment);
-            // Здесь дальнейшая обработка платежа !!!! сервис заказов
-
+            // Вызвать изменения в сервисе заказов
+            orderOperations.paymentFailed(payment.getOrderId());
         } catch (NoOrderFoundException e) {
             throw new NoOrderFoundException(e.getMessage());
         }
-        log.info("Отказ в оплате заказа");
+        log.info("Отказ в оплате заказа, изменили Payment, вызвали Order");
     }
 
     private BigDecimal calculatePriceWithTax(BigDecimal basePrice) {
