@@ -44,7 +44,7 @@ import java.util.UUID;
 @Table(name = "products")
 public class Product {
     @Id
-    //@GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     //private UUID cartId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
     @Column(name = "product_id")
     private UUID productId;

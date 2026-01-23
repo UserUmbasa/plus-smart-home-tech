@@ -46,9 +46,10 @@ import java.util.*;
 @Table(name = "orders")
 public class Order {
     @Id //  идентификатор сущности
-    // @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "order_id")
-    private UUID orderId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");;
+    private UUID orderId;
+    // private UUID orderId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
 
     @Column(name = "order_state", nullable = false) // состояние заказа
     @Enumerated(EnumType.STRING)

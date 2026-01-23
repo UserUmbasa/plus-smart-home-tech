@@ -16,9 +16,11 @@ import java.util.UUID;
 @Table(name = "carts")
 public class ShoppingCart {
     @Id
-    // @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "cart_id")
-    private UUID cartId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+    private UUID cartId;
+    // private UUID cartId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+
     @Column(nullable = false)
     private String username;
     @Column(nullable = false)
