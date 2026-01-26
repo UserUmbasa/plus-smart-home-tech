@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: payment
+
+  config:
+  # import: configserver:http://localhost:8888 Указывает на расположение Config Server, если напрямую
+    import: "configserver:"  # используем Service Discovery
+
+  cloud:
+    config:
+      fail-fast: true
+      retry:
+        useRandomPolicy: true
+        max-interval: 6000
+
+# Настройки Eureka клиента
+eureka:
+  client:
+    serviceUrl:  # URL для связи с Eureka сервером
+      defaultZone: http://localhost:8761/eureka/

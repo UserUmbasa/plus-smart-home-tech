@@ -18,6 +18,19 @@ spring:
         default_schema: warehouse
         format_sql: true
 
+eureka:
+  instance:
+    # Использовать IP вместо имени хоста (решает проблему с DNS)
+    prefer-ip-address: true
+    # Явно задаем формат ID, чтобы там был IP, а не имя хоста
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${random.value}
+
+server:
+  port : 0 #63524
+
+
+
+
 #    show-sql: true  # Добавляем здесь
 #    logging: # Добавляем секцию логирования
 #      level:
@@ -28,7 +41,3 @@ spring:
 #              descriptor:
 #                sql:
 #                  BasicBinder: TRACE
-
-server:
-  port : 0 #63524
-

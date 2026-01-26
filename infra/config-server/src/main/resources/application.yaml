@@ -14,6 +14,7 @@ spring:
             - #{application} — имя приложения-клиента, которое будет использовать сервер конфигураций.
             - classpath:config/telemetry/{application}
             - classpath:config/commerce/{application}
+            - classpath:config/infra/{application}
   discovery: # Добавляем секцию discovery
     enabled: true  # Включаем обнаружение сервисов
     service-id: config-server  # Указываем ID сервиса

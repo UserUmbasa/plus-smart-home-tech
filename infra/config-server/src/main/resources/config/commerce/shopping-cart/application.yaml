@@ -23,22 +23,18 @@ spring:
         default_schema: cart
         format_sql: true
 
-#    show-sql: true
-#    logging:
-#      level:
-#        org:
-#          hibernate:
-#            SQL: DEBUG
-#            type:
-#              descriptor:
-#                sql:
-#                  BasicBinder: TRACE
+eureka:
+  instance:
+    # Использовать IP вместо имени хоста (решает проблему с DNS)
+    prefer-ip-address: true
+    # Явно задаем формат ID, чтобы там был IP, а не имя хоста
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${random.value}
 
 resilience4j:
   circuitbreaker:
     instances:
       warehouse:
-        ignore-exceptions: # Добавил, чтобы 400 ошибки не ломали схему, не помогает
+        ignore-exceptions: # Добавил, чтобы 400 ошибки не ломали схему
           - ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse
           - feign.FeignException.BadRequest
         failure-rate-threshold: 50
@@ -60,3 +56,17 @@ resilience4j:
 server:
   port : 0 #63554
 
+
+
+
+
+#    show-sql: true
+#    logging:
+#      level:
+#        org:
+#          hibernate:
+#            SQL: DEBUG
+#            type:
+#              descriptor:
+#                sql:
+#                  BasicBinder: TRACE

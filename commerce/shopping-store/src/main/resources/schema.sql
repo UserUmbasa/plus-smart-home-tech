@@ -1,7 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS store;
 
 CREATE TABLE IF NOT EXISTS products (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    product_id UUID NOT NULL PRIMARY KEY,
     product_name VARCHAR(50) NOT NULL,
     description VARCHAR(500) NOT NULL,
     image_src VARCHAR(100),

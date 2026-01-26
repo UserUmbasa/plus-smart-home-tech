@@ -102,6 +102,13 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
         return cartMapper.mapToCartDto(cart);
     }
 
+    @Override
+    public String getUsernameById(UUID cartId) {
+        ShoppingCart shoppingCart = cartRepository.findByCartId(cartId)
+                .orElseThrow(() -> new NotAuthorizedUserException("Корзина с таким ID не существует: {}" + cartId));
+        return shoppingCart.getUsername();
+    }
+
     private void validateUsername(String username) {
         if (username.isBlank()) {
             throw new NotAuthorizedUserException(username);

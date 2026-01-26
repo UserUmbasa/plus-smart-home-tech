@@ -2,6 +2,7 @@ package ru.yandex.practicum.dto.warehouse;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.UUID;
  * </ul>
  */
 @Data
+@AllArgsConstructor
 public class AddProductToWarehouseRequest {
     @NotNull
     private UUID productId;

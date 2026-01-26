@@ -5,15 +5,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.exception.NoSpecifiedProductInWarehouseException;
 import ru.yandex.practicum.exception.ProductInShoppingCartLowQuantityInWarehouse;
 import ru.yandex.practicum.exception.SpecifiedProductAlreadyInWarehouseException;
 import ru.yandex.practicum.mapper.WarehouseMapper;
+import ru.yandex.practicum.model.OrderBooking;
 import ru.yandex.practicum.model.WarehouseProduct;
+import ru.yandex.practicum.repository.BookingRepository;
 import ru.yandex.practicum.repository.WarehouseRepository;
 
 import java.security.SecureRandom;
@@ -26,8 +25,10 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
     private final WarehouseRepository warehouseRepository;
+    private final BookingRepository bookingRepository;
     private final WarehouseMapper warehouseMapper;
     private final AddressDto warehouseAddress = initAddress();
+    private final WarehouseMapper mapper;
 
 
     @Transactional
@@ -95,9 +96,62 @@ public class WarehouseServiceImpl implements WarehouseService {
         return warehouseAddress;
     }
 
+    @Transactional
+    @Override // Собрать товары к заказу для подготовки к отправке.
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        BookedProductsDto result = checkProductQuantityEnoughForShoppingCart(mapper.mapToShoppingCartDto(request));
+        Map<UUID, Integer> products = request.getProducts();
+        // выдернули с базы
+        List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(request.getProducts().keySet());
+        Map<UUID, WarehouseProduct> productMap = warehouseProducts.stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+        // Обновляем количество для каждого возвращаемого товара
+        for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
+            UUID productId = entry.getKey();
+            Integer quantityToAdd = entry.getValue();
+            WarehouseProduct product = productMap.get(productId);
+            product.setQuantity(product.getQuantity() - quantityToAdd);
+        }
+        // Сохраняем изменения пакетно
+        warehouseRepository.saveAll(warehouseProducts);
+        // сохранили в БД
+        OrderBooking orderBooking = new OrderBooking();
+        orderBooking.setOrderId(request.getOrderId());
+        orderBooking.setProducts(products);
+        bookingRepository.save(orderBooking);
+        log.info("Товары к заказу для передачи в доставку собраны");
+        return result;
+    }
+
+    @Transactional
+    @Override // Передать товары в доставку. Вызывается из сервиса доставки
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+        OrderBooking orderBooking = bookingRepository.findByOrderId(request.getOrderId());
+        orderBooking.setDeliveryId(request.getDeliveryId());
+        bookingRepository.save(orderBooking);
+    }
+
+    @Transactional
+    @Override
+    public void acceptReturn(Map<UUID, Integer> productsToReturn) {
+        List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(productsToReturn.keySet());
+        Map<UUID, WarehouseProduct> productMap = warehouseProducts.stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+        // Обновляем количество для каждого возвращаемого товара
+        for (Map.Entry<UUID, Integer> entry : productsToReturn.entrySet()) {
+            UUID productId = entry.getKey();
+            Integer quantityToAdd = entry.getValue();
+            WarehouseProduct product = productMap.get(productId);
+            product.setQuantity(product.getQuantity() + quantityToAdd);
+        }
+        // Сохраняем изменения пакетно
+        warehouseRepository.saveAll(warehouseProducts);
+    }
+
+
     private AddressDto initAddress() {
         final String[] addresses = new String[]{"ADDRESS_1", "ADDRESS_2"};
-        final String address = addresses[Random.from(new SecureRandom()).nextInt(0, addresses.length)];
+        final String address = addresses[Random.from(new SecureRandom()).nextInt(0, 1)];
         return AddressDto.builder()
                 .city(address)
                 .street(address)
