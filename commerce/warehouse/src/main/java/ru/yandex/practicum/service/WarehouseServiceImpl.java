@@ -101,17 +101,24 @@ public class WarehouseServiceImpl implements WarehouseService {
     public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
         BookedProductsDto result = checkProductQuantityEnoughForShoppingCart(mapper.mapToShoppingCartDto(request));
         Map<UUID, Integer> products = request.getProducts();
+        // выдернули с базы
+        List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(request.getProducts().keySet());
+        Map<UUID, WarehouseProduct> productMap = warehouseProducts.stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+        // Обновляем количество для каждого возвращаемого товара
         for (Map.Entry<UUID, Integer> entry : products.entrySet()) {
-            UUID id = entry.getKey();
-            Integer quantity = entry.getValue();
-            warehouseRepository.decreaseQuantity(id, quantity); // уменьшили остаток
+            UUID productId = entry.getKey();
+            Integer quantityToAdd = entry.getValue();
+            WarehouseProduct product = productMap.get(productId);
+            product.setQuantity(product.getQuantity() - quantityToAdd);
         }
+        // Сохраняем изменения пакетно
+        warehouseRepository.saveAll(warehouseProducts);
         // сохранили в БД
         OrderBooking orderBooking = new OrderBooking();
         orderBooking.setOrderId(request.getOrderId());
         orderBooking.setProducts(products);
         bookingRepository.save(orderBooking);
-
         log.info("Товары к заказу для передачи в доставку собраны");
         return result;
     }
@@ -127,19 +134,30 @@ public class WarehouseServiceImpl implements WarehouseService {
     @Transactional
     @Override
     public void acceptReturn(Map<UUID, Integer> productsToReturn) {
-        productsToReturn.forEach((id, amount) ->
-                addProductToWarehouse(new AddProductToWarehouseRequest(id, amount))
-        );
-        log.info("Возврат товара на склад: {}",productsToReturn);
+        List<WarehouseProduct> warehouseProducts = warehouseRepository.findAllById(productsToReturn.keySet());
+        Map<UUID, WarehouseProduct> productMap = warehouseProducts.stream()
+                .collect(Collectors.toMap(WarehouseProduct::getProductId, product -> product));
+        // Обновляем количество для каждого возвращаемого товара
+        for (Map.Entry<UUID, Integer> entry : productsToReturn.entrySet()) {
+            UUID productId = entry.getKey();
+            Integer quantityToAdd = entry.getValue();
+            WarehouseProduct product = productMap.get(productId);
+            product.setQuantity(product.getQuantity() + quantityToAdd);
+        }
+        // Сохраняем изменения пакетно
+        warehouseRepository.saveAll(warehouseProducts);
     }
 
+
     private AddressDto initAddress() {
+        final String[] addresses = new String[]{"ADDRESS_1", "ADDRESS_2"};
+        final String address = addresses[Random.from(new SecureRandom()).nextInt(0, 1)];
         return AddressDto.builder()
-                .city("Отговорск")
-                .street("Тупик Отмазок")
-                .house("Не я")
-                .country("Великое Королевство Отлагательств")
-                .flat("Не знаю")
+                .city(address)
+                .street(address)
+                .house(address)
+                .country(address)
+                .flat(address)
                 .build();
     }
 }

@@ -37,7 +37,7 @@ public class DeliveryServiceImpl implements DeliveryService {
     @Override
     public DeliveryDto planDelivery(DeliveryDto deliveryDto) {
         Delivery result = deliveryRepository.save(deliveryMapper.mapToDelivery(deliveryDto));
-        log.info("Создали новую доставку");
+        log.info("Создали новую доставку с идентификатором: {}", result);
         return deliveryMapper.mapToDeliveryDto(result);
     }
 
@@ -55,48 +55,48 @@ public class DeliveryServiceImpl implements DeliveryService {
         }
         totalCost = totalCost.add(BigDecimal.valueOf(orderDto.getDeliveryWeight()).multiply(WEIGHT_MULTIPLIER));
         totalCost = totalCost.add(BigDecimal.valueOf(orderDto.getDeliveryVolume()).multiply(VOLUME_MULTIPLIER));
-        log.info("Расчёт полной стоимости доставки");
+        log.info("Расчёт полной стоимости доставки: {}", totalCost);
         return totalCost;
     }
 
     @Transactional
     @Override // Эмуляция получения товара в доставку.
-    public void deliveryPicked(UUID orderId) {
-        Delivery delivery = getDeliveryById(orderId);
+    public void deliveryPicked(UUID deliveryId) {
+        Delivery delivery = getDeliveryById(deliveryId);
         delivery.setDeliveryState(DeliveryState.IN_PROGRESS);
         // передали в доставку (забрали со склада)
-        warehouseClient.shippedToDelivery(new ShippedToDeliveryRequest(orderId,delivery.getDeliveryId()));
+        warehouseClient.shippedToDelivery(new ShippedToDeliveryRequest(deliveryId,delivery.getDeliveryId()));
         // обновили заказ на ASSEMBLED (в процессе сборки)
-        orderOperations.assembly(orderId);
-        log.info("Товар передан в доставку");
+        orderOperations.assembly(delivery.getOrderId());
+        log.info("Товар передан в доставку: deliveryId = {}", deliveryId);
     }
 
     @Transactional
     @Override // Эмуляция успешной доставки товара.
-    public void deliverySuccessful(UUID orderId) {
-        Delivery delivery = getDeliveryById(orderId);
+    public void deliverySuccessful(UUID deliveryId) {
+        Delivery delivery = getDeliveryById(deliveryId);
         delivery.setDeliveryState(DeliveryState.DELIVERED);
         deliveryRepository.save(delivery);
         // обновили заказ на DELIVERED (доставлено)
-        orderOperations.delivery(orderId);
-        log.info("Успешная доставка товара");
+        orderOperations.delivery(delivery.getOrderId());
+        log.info("Успешная доставка товара: deliveryId = {}", deliveryId);
     }
 
     @Transactional
     @Override
-    public void deliveryFailed(UUID orderId) {
-        Delivery delivery = getDeliveryById(orderId);
+    public void deliveryFailed(UUID deliveryId) {
+        Delivery delivery = getDeliveryById(deliveryId);
         delivery.setDeliveryState(DeliveryState.FAILED);
         deliveryRepository.save(delivery);
         // обновили заказ на DELIVERY_FAILED (не доставлено)
-        orderOperations.deliveryFailed(orderId);
-        log.info("Не успешная доставка товара");
+        orderOperations.deliveryFailed(delivery.getOrderId());
+        log.info("Не успешная доставка товара: deliveryId = {}", deliveryId);
     }
 
     // ---------------------------------------------------------------
-    private Delivery getDeliveryById(UUID orderId) {
-        return deliveryRepository.findByOrderId(orderId)
+    private Delivery getDeliveryById(UUID deliveryId) {
+        return deliveryRepository.findByOrderId(deliveryId)
                 .orElseThrow(() -> new NoDeliveryFoundException
-                        ("Доставки для такого заказа не найдено: orderId = " + orderId));
+                        ("Доставки для такого заказа не найдено: orderId = " + deliveryId));
     }
 }

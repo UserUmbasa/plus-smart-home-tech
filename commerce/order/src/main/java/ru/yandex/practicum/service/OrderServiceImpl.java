@@ -37,6 +37,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper mapper;
 
+    @Transactional
     @Override
     public OrderDto newOrder(OrderRequestDto request) {
         // проверили наличие на складе
@@ -58,11 +59,12 @@ public class OrderServiceImpl implements OrderService {
         return mapper.mapToOrderDto(order);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public List<OrderDto> getClientOrders(String username) {
         validateUsername(username);
         List<Order> result = orderRepository.findAllByUsername(username);
-        log.debug("Вернули список заказов");
+        log.debug("Вернули список заказов - {}", result);
         return result.stream().
                 map(mapper::mapToOrderDto).
                 toList();
@@ -80,10 +82,8 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     @Override
     public OrderDto payment(UUID orderId) {
-        OrderDto orderDto = updateOrderState(orderId, OrderState.PAID
+        return updateOrderState(orderId, OrderState.PAID
                 ,"Заказ оплачен");
-        PaymentDto payment = paymentOperations.payment(orderDto);
-        return orderDto;
     }
 
     @Transactional
@@ -100,44 +100,54 @@ public class OrderServiceImpl implements OrderService {
                 ,"Успешная доставка заказа");
     }
 
+    @Transactional
     @Override
     public OrderDto deliveryFailed(UUID orderId) {
         return updateOrderState(orderId, OrderState.DELIVERY_FAILED
                 ,"Не успешная доставка заказа");
     }
 
+    @Transactional
     @Override
     public OrderDto complete(UUID orderId) {
         return updateOrderState(orderId, OrderState.COMPLETED
                 ,"Заказ завершен");
     }
 
+    @Transactional
     @Override
     public OrderDto calculateTotalCost(UUID orderId) {
         Order order = getOrderById(orderId);
         BigDecimal totalCost = paymentOperations.getTotalCost(mapper.mapToOrderDto(order));
         order.setTotalPrice(totalCost);
+
+        PaymentDto paymentDto =  paymentOperations.payment(mapper.mapToOrderDto(order));
+        order.setPaymentId(paymentDto.getPaymentId());
+
         order = orderRepository.save(order);
-        log.info("Вычислили и задали общую стоимость заказа");
+        log.info("Вычислили и задали общую стоимость заказа - {}", order);
         return mapper.mapToOrderDto(order);
     }
 
+    @Transactional
     @Override
     public OrderDto calculateDeliveryCost(UUID orderId) {
         Order order = getOrderById(orderId);
         BigDecimal deliveryCost = deliveryOperations.deliveryCost(mapper.mapToOrderDto(order));
         order.setDeliveryPrice(deliveryCost);
         order = orderRepository.save(order);
-        log.info("Вычислили и задали стоимость доставки заказа");
+        log.info("Вычислили и задали стоимость доставки заказа - {}", order);
         return mapper.mapToOrderDto(order);
     }
 
+    @Transactional
     @Override // Вызывает сторонний сервис (Delivery)
     public OrderDto assembly(UUID orderId) {
         return updateOrderState(orderId, OrderState.ASSEMBLED
                 ,"Успешная сборка заказа");
     }
 
+    @Transactional
     @Override
     public OrderDto assemblyFailed(UUID orderId) {
         return updateOrderState(orderId, OrderState.ASSEMBLY_FAILED

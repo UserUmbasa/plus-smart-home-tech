@@ -22,4 +22,21 @@ public class Address {
     private String street;
     private String house;
     private String flat;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Address address = (Address) o;
+        return country.equals(address.country) && city.equals(address.city) && street.equals(address.street);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = country.hashCode();
+        result = 31 * result + city.hashCode();
+        result = 31 * result + street.hashCode();
+        return result;
+    }
 }

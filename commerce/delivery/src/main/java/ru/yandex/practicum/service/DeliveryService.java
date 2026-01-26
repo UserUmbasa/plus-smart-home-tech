@@ -11,9 +11,9 @@ public interface DeliveryService {
 
     BigDecimal deliveryCost(OrderDto orderDto);
 
-    void deliveryPicked(UUID orderId);
+    void deliveryPicked(UUID deliveryId);
 
-    void deliverySuccessful(UUID orderId);
+    void deliverySuccessful(UUID deliveryId);
 
-    void deliveryFailed(UUID orderId);
+    void deliveryFailed(UUID deliveryId);
 }

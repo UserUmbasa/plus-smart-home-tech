@@ -87,17 +87,16 @@ public class PaymentServiceImpl implements PaymentService {
         return result;
     }
 
+    @Transactional
     @Override // Метод для эмуляции успешной оплаты платежного шлюза
     public void paymentSuccess(UUID paymentId) {
-        try {
-            Payment payment = paymentRepository.findById(paymentId)
+        Payment payment = paymentRepository.findById(paymentId)
                     .orElseThrow(() -> new NoOrderFoundException("Оплата не найдена"));
-            // изменить статус на SUCCESS
-            payment.setPaymentState(PaymentState.SUCCESS);
-            paymentRepository.save(payment);
-        } catch (NoOrderFoundException e) {
-            throw new NoOrderFoundException(e.getMessage());
-        }
+        // изменить статус на SUCCESS
+        payment.setPaymentState(PaymentState.SUCCESS);
+        // изменение в сервисе заказов — статус оплачен
+        orderOperations.payment(payment.getOrderId());
+        paymentRepository.save(payment);
         log.info("Успешная оплата заказа");
     }
 
