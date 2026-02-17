@@ -11,7 +11,13 @@ import ru.yandex.practicum.dto.shoppingStore.ProductPageDto;
 import ru.yandex.practicum.dto.shoppingStore.QuantityState;
 import java.util.UUID;
 
-@FeignClient(name = "shopping-store", url = "/api/v1/shopping-store")
+/**
+ *  Памятка
+ * • url в @FeignClient: Используется для задания полного базового URL (с хостом и портом), если вы не используете обнаружение сервисов или хотите явно указать адрес.
+ * • name в @FeignClient: Используется для обнаружения сервисов (через Spring Cloud, Eureka, Consul и т.д.). Feign запрашивает у системы обнаружения реальный адрес сервиса по этому имени.
+ * • path в @FeignClient: Используется для задания общего префикса пути для всех методов клиента. Это полезно, когда все эндпоинты сервиса начинаются с одинаковой части URL.
+ */
+@FeignClient(name = "shopping-store", path = "/api/v1/shopping-store")
 public interface ShoppingStoreOperations {
 
     @PutMapping
@@ -34,6 +40,4 @@ public interface ShoppingStoreOperations {
             @RequestParam("productId") UUID productId,
             @RequestParam("quantityState") QuantityState quantityState
     );
-
-
 }

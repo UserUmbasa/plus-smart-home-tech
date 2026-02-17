@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS cart;
 
 -- Сначала создаем основную таблицу
 CREATE TABLE IF NOT EXISTS carts (
-    cart_id UUID PRIMARY KEY DEFAULT gen_random_uuid(), -- случайные значения
+    cart_id UUID NOT NULL PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT true
 );

@@ -17,6 +17,6 @@ spring:
 eureka:
   client:
     serviceUrl:  # URL для связи с Eureka сервером
-      defaultZone: http://${eureka.instance.hostname:localhost}:${eureka.instance.port:8761}/eureka/
+      defaultZone: http://localhost:8761/eureka/
       # Используются переменные для гибкости настройки хоста и порта
       # По умолчанию используется localhost:8761

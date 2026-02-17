@@ -23,40 +23,36 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Transactional
     @Override
     public ProductDto addProduct(ProductDto productDto) {
-        log.debug("Сохраняем новый товар в DB - {}", productDto);
         Product product = productMapper.mapToProduct(productDto);
-        productRepository.save(product);
-        log.debug("Сохранили товар в DB - {}", product);
+        product = productRepository.save(product);
+        log.info("Сохранили товар в DB - {}", product);
         return productMapper.mapToProductDto(product);
     }
 
     @Transactional
     @Override
     public ProductDto updateProduct(ProductDto productDto) {
-        log.debug("Обновляем товар в DB - {}", productDto);
         findProductByIdOrThrow(productDto.getProductId());
         Product result = productRepository.save(productMapper.mapToProduct(productDto));
-        log.debug("Обновили товар в DB - {}", result);
+        log.info("Обновили товар в DB - {}", result);
         return productMapper.mapToProductDto(result);
     }
 
     @Transactional
     @Override
     public boolean removeProduct(UUID productId) {
-        log.debug("Деактивируем товар в DB c ID - {}", productId);
         Product product = findProductByIdOrThrow(productId);
         product.setProductState(ProductState.DEACTIVATE);
         productRepository.save(product);
-        log.debug("Деактивировали товар в DB - {}", product);
+        log.info("Деактивировали товар в DB - {}", product);
         return true;
     }
 
-    @Transactional(readOnly = true)
+    @Transactional()
     @Override
     public ProductDto getProductById(UUID productId) {
-        log.debug("Запрашиваем товар с ID: {}", productId);
         Product product = findProductByIdOrThrow(productId);
-        log.debug("Получили из DB товар {}", product);
+        log.info("Получили из DB товар {}", product);
         return productMapper.mapToProductDto(product);
     }
 
@@ -76,10 +72,9 @@ public class ShoppingStoreServiceImpl implements ShoppingStoreService {
     @Override
     public boolean updateQuantityState(UUID productId, QuantityState quantityState) {
         Product product = findProductByIdOrThrow(productId);
-        log.debug("Обновляем количество товара в DB - {}", product);
         product.setQuantityState(quantityState);
         productRepository.save(product);
-        log.debug("Обновили количество товара в DB - {}", product);
+        log.info("Обновили количество товара в DB - {}", product);
         return true;
     }
 

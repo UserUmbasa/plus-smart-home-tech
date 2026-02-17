@@ -3,12 +3,11 @@ package ru.yandex.practicum.api.warehouse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.exception.WarehouseServiceException;
 
+import java.util.Map;
+import java.util.UUID;
 
 
 @Slf4j
@@ -36,6 +35,24 @@ public class WarehouseFeignClientFallback implements WarehouseClient {
     @Override
     public AddressDto getWarehouseAddress() {
         log.error("Не удалось получить адрес склада. Склад недоступен");
+        throw new WarehouseServiceException("Временная недоступность сервиса склада");
+    }
+
+    @Override
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        log.error("Не собрать товары к заказу для подготовки к отправке. Склад недоступен");
+        throw new WarehouseServiceException("Временная недоступность сервиса склада");
+    }
+
+    @Override
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+        log.error("Не удалось передать товары в доставку. Склад недоступен");
+        throw new WarehouseServiceException("Временная недоступность сервиса склада");
+    }
+
+    @Override
+    public void acceptReturn(Map<UUID, Integer> productsToReturn) {
+        log.error("Не удалось принять возврат товаров на склад. Склад недоступен");
         throw new WarehouseServiceException("Временная недоступность сервиса склада");
     }
 }

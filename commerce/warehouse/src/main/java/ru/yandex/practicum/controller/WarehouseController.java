@@ -6,11 +6,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.api.warehouse.WarehouseClient;
 import ru.yandex.practicum.dto.shoppingCart.ShoppingCartDto;
-import ru.yandex.practicum.dto.warehouse.AddProductToWarehouseRequest;
-import ru.yandex.practicum.dto.warehouse.AddressDto;
-import ru.yandex.practicum.dto.warehouse.BookedProductsDto;
-import ru.yandex.practicum.dto.warehouse.NewProductInWarehouseRequest;
+import ru.yandex.practicum.dto.warehouse.*;
 import ru.yandex.practicum.service.WarehouseService;
+
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -19,23 +19,38 @@ import ru.yandex.practicum.service.WarehouseService;
 public class WarehouseController implements WarehouseClient {
     private final WarehouseService warehouseService;
 
-    @Override
+    @Override // PUT /api/v1/warehouse - Добавить новый товар на склад
     public void newProductInWarehouse(NewProductInWarehouseRequest request) {
         warehouseService.newProductInWarehouse(request);
     }
 
-    @Override
+    @Override // POST /api/v1/warehouse/check - Проверка количества товаров на складе
     public BookedProductsDto checkProductQuantityEnoughForShoppingCart(ShoppingCartDto cartDto) {
         return warehouseService.checkProductQuantityEnoughForShoppingCart(cartDto);
     }
 
-    @Override
+    @Override // POST /api/v1/warehouse/add - Принять товар на склад
     public void addProductToWarehouse(AddProductToWarehouseRequest request) {
         warehouseService.addProductToWarehouse(request);
     }
 
-    @Override
+    @Override // GET /api/v1/warehouse/address - Предоставить адрес склада для расчёта доставки
     public AddressDto getWarehouseAddress() {
         return warehouseService.getWarehouseAddress();
+    }
+
+    @Override // POST /api/v1/warehouse/assembly - Собрать товары к заказу для подготовки к отправке"
+    public BookedProductsDto assemblyProductsForOrder(AssemblyProductsForOrderRequest request) {
+        return warehouseService.assemblyProductsForOrder(request);
+    }
+
+    @Override // POST /api/v1/warehouse/shipped - Передать товары в доставку. Вызывается из сервиса доставки
+    public void shippedToDelivery(ShippedToDeliveryRequest request) {
+        warehouseService.shippedToDelivery(request);
+    }
+
+    @Override // POST /api/v1/warehouse/return - Принять возврат товаров на склад
+    public void acceptReturn(Map<UUID, Integer> productsToReturn) {
+        warehouseService.acceptReturn(productsToReturn);
     }
 }
